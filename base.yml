@@ -1,0 +1,11 @@
+- hosts: all
+  gather_facts: yes
+  tasks:
+  - name: Set hostname according new_hostname variable
+    shell: "hostnamectl set-hostname {{new_hostname}}"
+    become: yes
+    when: ( new_hostname is defined ) and ( ansible_facts['fqdn'] != new_hostname )
+  
+  - name: Install updates
+    yum: name=* state=latest update_cache=yes
+    become: yes
