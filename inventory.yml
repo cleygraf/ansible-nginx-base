@@ -5,6 +5,7 @@ nginxplus-ws:
     192.168.1.102:
       new_hostname: web02.home.local
   vars:
+    ansible_become: yes
     ansible_become_user: root
     ansible_become_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
@@ -13,4 +14,4 @@ nginxplus-ws:
           62626435656239336135666562373961346664326239653166653866663639303461636238346662
           6165366364663034650a323966373830316237646330386263613165663034656364653737363466
           3632
-    nginxplus_cert_key_path: ../../nginx/certs/
+    nginxplus_cert_key_path: ~/nginx/certs/
