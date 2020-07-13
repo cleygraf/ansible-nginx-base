@@ -1,3 +1,6 @@
+- name: copy nginx-plus configuration file hello.conf
+  template: src=templates/etc/nginx/conf.d/hello.conf dest=/etc/nginx/conf.d/hello.conf owner=root mode=0644
+
 - name: copy nginx-plus configuration file default.conf
   template: src=templates/etc/nginx/conf.d/default.conf dest=/etc/nginx/conf.d/default.conf owner=root mode=0644
 
