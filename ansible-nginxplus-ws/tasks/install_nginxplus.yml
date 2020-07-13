@@ -4,16 +4,18 @@
   file: path=/etc/ssl/nginx state=directory group=root mode=0700
 
 - name: NGINX Plus | Copying NGINX Plus repository certificate
-  copy: src=/etc/ssl/nginx/nginx-repo.crt dest=/etc/ssl/nginx/nginx-repo.crt owner=root group=root mode=0700
+  copy: src={{ nginxplus_cert_key_path }}nginx-repo.crt dest=/etc/ssl/nginx/nginx-repo.crt owner=root group=root mode=0700
 
 - name: NGINX Plus | Copying NGINX Plus repository key
-  copy: src=/etc/ssl/nginx/nginx-repo.key dest=/etc/ssl/nginx/nginx-repo.key owner=root group=root mode=0700
-
-- name: NGINX Plus | Downloading NGINX Plus CA certificate
-  get_url: url=https://cs.nginx.com/static/files/CA.crt dest=/etc/ssl/nginx/CA.crt mode=0700
+  copy: src={{ nginxplus_cert_key_path }}nginx-repo.key dest=/etc/ssl/nginx/nginx-repo.key owner=root group=root mode=0700
 
 - name: NGINX Plus | Downloading yum NGINX Plus repository
   get_url: url=https://cs.nginx.com/static/files/nginx-plus-7.repo dest=/etc/yum.repos.d/nginx-plus-7.repo mode=0700
+
+- name: Install required package ca-certificates 
+  yum:
+    name: ca-certificates
+    state: latest
 
 - name: NGINX Plus | Installing NGINX Plus
   yum:
