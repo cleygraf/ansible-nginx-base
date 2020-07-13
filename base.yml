@@ -20,3 +20,12 @@
       name: firewalld
       enabled: no
       state: stopped
+
+  - name: Add IP address of all hosts to all hosts
+    lineinfile:
+      dest: /etc/hosts
+      regexp: '.*{{ item }}$'
+      line: "{{ hostvars[item].ansible_ssh_host }} {{item}}"
+      state: present
+    when: hostvars[item].ansible_ssh_host is defined
+    with_items: "{{ groups.all }}"
