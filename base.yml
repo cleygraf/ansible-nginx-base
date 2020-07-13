@@ -9,3 +9,14 @@
   - name: Install updates
     yum: name=* state=latest update_cache=yes
     become: yes
+
+  - name: Install net-tools (netstat, ...)
+    yum:
+      name: net-tools
+      state: latest
+
+  - name: Disable and stop firewalld
+    service:
+      name: firewalld
+      enabled: no
+      state: stopped
