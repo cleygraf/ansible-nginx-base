@@ -54,3 +54,4 @@ nginxplus-tls:
           6165366364663034650a323966373830316237646330386263613165663034656364653737363466
           3632
     nginxplus_cert_key_path: ~/nginx/certs/
+    server_cert_key_path: ~/nginx/ssl/
