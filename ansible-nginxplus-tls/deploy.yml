@@ -1,0 +1,9 @@
+# ./deploy.yml
+
+- hosts: nginxplus-tls
+  vars_files:
+    - 'vars.yml'
+  tasks:
+    - include: 'tasks/install_nginxplus.yml'
+#    - include: 'tasks/install_certbot.yml'
+    - include: 'tasks/copy_configurations.yml'
