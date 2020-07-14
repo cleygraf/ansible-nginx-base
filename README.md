@@ -1,52 +1,58 @@
 # Ansible / NGINX Plus Demo
 
-This is a demonstration on how to deploy and configure NGINX Plus as both a load
-balancer and a webserver on CentOS7 using Ansible.
+This is a demonstration on how to deploy and configure NGINX Plus as a load
+balancer, a webserver and to terminate tls on CentOS7 using Ansible.
+It's based on kmjones1979's work. I have updated it if necessary and added the tls termination part.
 
 Tested using...
 
 ```
-[kjones@zion-development ~]$ cat /etc/redhat-release 
-CentOS Linux release 7.1.1503 (Core)
-
-[kjones@zion-development ~]$ ansible --version
-ansible 1.9.2
+[cleygraf@tls01 ~]$ cat /etc/redhat-release
+CentOS Linux release 7.8.2003 (Core)
+[cleygraf@tls01 ~]$
 ```
 
 #### Checkout ansible-demo
 
 ```
-git clone git@github.com:kmjones1979/ansible-demo.git
+git clone git@github.com:cleygraf/ansible-demo.git
 ```
 
-#### Install Ansible
+#### Prerequesits
+
+Setup ssh login with keys for all servers. You might use ssh-add to add your private key to the ssh agent.
+
+
+#### Configure Ansible inventory
+
+I prefer to include as much as possible in the git repository. So I have added an inventory.yml file to hold all the details about the servers:
 
 ```
-sudo yum install -y epel-release
-sudo yum update
-sudo yum install -y ansible
+...
+nginxplus-tls:
+  hosts:
+    tls01:
+      new_hostname: tls01.home.local
+      ansible_ssh_host: 192.168.1.112
+    tls02:
+      new_hostname: tls02.home.local
+      ansible_ssh_host: 192.168.1.113
+  vars:
+    ansible_become: yes
+    ansible_become_user: root
+    ansible_become_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          31323961353662633632306166663033643436313135366430666434313862656666393536323265
+          6635316339353537313736643163613439666134623733350a383461393638643762626630383232
+          62626435656239336135666562373961346664326239653166653866663639303461636238346662
+          6165366364663034650a323966373830316237646330386263613165663034656364653737363466
+          3632
+    nginxplus_cert_key_path: ~/nginx/certs/
+    server_cert_key_path: ~/nginx/ssl/
+...
 ```
 
-#### Configure Ansible hosts file
-```
-sudo vim /etc/ansible/hosts
-```
-
-This repository contains two ansible deployment configurations for 
-both NGINX Plus as a load balancer and NGINX Plus as a webserver
-
-Example Ansible hosts file...
-
-```
-# /etc/ansible/hosts
-
-[nginxplus-lb]
-nginxplus-lb1.domain.com
-[nginxplus-ws]
-nginxplus-ws1.domain.com
-nginxplus-ws2.domain.com
-nginxplus-ws3.domain.com
-```
+Ansible will use the ip in *ansible_ssh_host* to connect to the target server. The hostname will be changed to "new_hostname". sudo will be used to become roor. If sudo needs a password, please encrypt and stored in ansible_become_password.
 
 #### Ensure Ansible server has valid NGINX Plus license key and cert
 
