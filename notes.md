@@ -24,3 +24,14 @@ Required package on WSL/Ubuntu: certbot python3-certbot-nginx
 
 `sudo certbot --manual certonly --config-dir ~/letsencrypt/ --work-dir ~/letsencrypt/ --logs-dir ~/letsencrypt/ --preferred-challenges dns`
 
+## NGINX+ API
+
+### Get upstream servers
+`curl 'http://lb01:8080/api/3/http/upstreams/backend/servers/'`
+
+### Remove upstream server
+`curl -X DELETE 'http://lb01:8080/api/3/http/upstreams/backend/servers/0'`
+
+### Add upstream server
+` curl -X POST -d '{"server":"192.168.1.101:80"}' 'http://lb01:8080/api/3/http/upstreams/backend/servers'`
+
