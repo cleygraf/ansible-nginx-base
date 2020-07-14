@@ -1,18 +1,7 @@
-
-- name: install epel-release
-  yum:
-    name: epel-release
-    state: latest
-
-- name: install pip
-  yum:
-    name: python-pip
-    state: latest
-
-- name: install httplib2
-  pip:
-    name: httplib2
-
 - uri:
-    url: http://{{ nginxplus_api_server }}/upstream_conf?add=&upstream=backend&server={{ ansible_default_ipv4.address }}:{{ nginx_ws_port }}
-    method: GET
+    url: http://{{ nginxplus_api_server }}/api/3/http/upstreams/backend/servers/
+    method: POST
+    body_format: json
+    body:
+      server: "{{ ansible_default_ipv4.address }}:{{ nginx_ws_port }}"
+    status_code: 201
