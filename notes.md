@@ -35,3 +35,12 @@ Required package on WSL/Ubuntu: certbot python3-certbot-nginx
 ### Add upstream server
 ` curl -X POST -d '{"server":"192.168.1.101:80"}' 'http://lb01:8080/api/3/http/upstreams/backend/servers'`
 
+## PowerCLI
+
+`foreach($vm in "web01", "web02", "lb01", "tls01", "tls02"){Get-VM $vm}`
+
+`foreach($vm in "web01", "web02", "lb01", "tls01", "tls02"){Start-VM -VM $vm -Confirm:$false}`
+
+`foreach($vm in "web01", "web02", "lb01", "tls01", "tls02"){Get-Snapshot -VM $vm | where {$_.IsCurrent -eq $true}}`
+
+`foreach($vm in "web01", "web02", "lb01", "tls01", "tls02"){$snap=Get-Snapshot -VM $vm | where {$_.IsCurrent -eq $true};Set-VM -VM $vm -SnapShot $snap -Confirm:$false}`
