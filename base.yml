@@ -1,21 +1,34 @@
 - hosts: all
   gather_facts: yes
-  tasks:
-  - name: Set hostname according new_hostname variable
-    shell: "hostnamectl set-hostname {{new_hostname}}"
-    become: yes
-    when: ( new_hostname is defined ) and ( ansible_facts['fqdn'] != new_hostname )
-  
-  - name: Install updates
-    yum: name=* state=latest update_cache=yes
-    become: yes
 
-  - name: Install net-tools (netstat, ...)
+  vars_files:
+  - 'vars.yml'
+
+  vars: 
+    ansible_become: yes
+
+  tasks:
+  - name: set hostname according inventory variable
+    shell: "hostnamectl set-hostname {{new_hostname}}"
+    when: ( new_hostname is defined ) and ( ansible_facts['nodename'] != new_hostname )
+ 
+  - name: install epel-release
+    yum:
+      name: epel-release
+      state: latest
+
+  - name: install updates
+    yum: 
+      name: "*" 
+      state: latest
+      update_cache: yes
+
+  - name: install net-tools (netstat, ...)
     yum:
       name: net-tools
       state: latest
 
-  - name: Disable and stop firewalld
+  - name: disable and stop firewalld
     service:
       name: firewalld
       enabled: no
@@ -25,7 +38,7 @@
     lineinfile:
       dest: /etc/hosts
       regexp: '.*{{ item }}$'
-      line: "{{ hostvars[item].ansible_ssh_host }} {{item}}"
+      line: "{{ hostvars[item].ansible_ssh_host }} {{ item }}.{{ subdomain }} {{ item }}"
       state: present
     when: hostvars[item].ansible_ssh_host is defined
     with_items: "{{ groups.all }}"
