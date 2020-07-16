@@ -3,8 +3,11 @@
 - hosts: nginxplus-tls
   vars_files:
     - 'vars.yml'
+
+  vars: 
+    ansible_become: yes
+
   tasks:
     - include: 'tasks/install_nginxplus.yml'
-#    - include: 'tasks/install_certbot.yml'
     - include: 'tasks/install_keepalived.yml'
     - include: 'tasks/copy_configurations.yml'
