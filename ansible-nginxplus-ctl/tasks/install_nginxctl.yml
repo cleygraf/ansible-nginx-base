@@ -1,0 +1,81 @@
+- name: install jq
+  yum:
+    name: jq
+    state: latest
+
+- name: install yum-plugin-versionlock
+  yum:
+    name: yum-plugin-versionlock
+    state: latest
+
+# - name: "unpack controller-installer-{{ c3version }}.tar.gz to /tmp"
+#   unarchive:
+#     src: "{{ nginx_binary_path }}/controller-installer-{{ c3version }}.tar.gz"
+#     dest: "/tmp"
+#     remote_src: no
+
+- name: temporary disable swap
+  shell: "/usr/sbin/swapoff -a"
+  
+- name: "Example1: Validate if a String or line is present in the file"
+  lineinfile:
+    path: /etc/fstab
+    regexp: '\s+swap\s+swap\s+'
+    state: absent
+    backup: yes
+
+# - name: install controller
+#   shell: > 
+#     ./install.sh 
+#     -n -c -w -y
+#     --smtp-host localhost --smtp-port 25 --smtp-authentication false --smtp-use-tls false --noreply-address "no-reply@{{ subdomain }}"
+#     --admin-firstname "{{ firstname }}" --admin-lastname "{{ lastname }}" --admin-email "{{ email }}" --admin-password "{{ password }}"
+#     --fqdn "{{ inventory_hostname_short }}.{{ subdomain }}" --organization-name "{{ organization }}"
+#     --tsdb-volume-type local
+#   args:
+#     chdir: "/tmp/controller-installer"
+#   become: no
+#   register: controller_output
+
+- name: login to the controller
+  uri:
+    url: "https://{{ baseurl }}/platform/login"
+    method: POST
+    body_format: json 
+    body: 
+      credentials: 
+        type: "BASIC"
+        username: "{{ email }}"
+        password: "{{ password }}"
+    status_code: 204
+    validate_certs: False
+  register: login 
+
+- name: POST license
+  uri:
+    url: "https://{{ baseurl }}/platform/license-file"
+    method: POST
+    headers:
+      Cookie: "{{ login.set_cookie }}"  
+    body_format: json
+    body:
+      content: "{{ lookup( 'file', '{{ nginx_license_path }}/controller_license.txt' ) | b64encode }}"
+    status_code: 200
+    validate_certs: False
+
+- name: Create local lab location
+  uri:
+    url: "https://{{ baseurl }}/infrastructure/locations"
+    method: POST
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body:
+      metadata:
+        name: "local"
+        displayName: "Local Lab"
+        description: "Multipass environment"
+      desiredState:
+        type: "OTHER_LOCATION"
+    status_code: 201
+    validate_certs: False
