@@ -2,18 +2,21 @@
 ### Deploy web server
 `ansible-playbook ./base.yml -l nginxplus-ws -i ./inventory.yml --ask-vault-pass`
 
-`ansible-playbook ./ansible-nginxplus-ws/deploy.yml -l nginxplus-ws -i ./inventory.yml --ask-vault-pass`
+`ansible nginxplus-ws -i ./inventory.yml -m reboot -b`
 
+`ansible-playbook ./ansible-nginxplus-ws/deploy.yml -l nginxplus-ws -i ./inventory.yml --ask-vault-pass`
 
 ### Deploy load balancer
 `ansible-playbook ./base.yml -l nginxplus-lb -i ./inventory.yml --ask-vault-pass`
+
+`ansible nginxplus-lb -i ./inventory.yml -m reboot -b`
 
 `ansible-playbook ./ansible-nginxplus-lb/deploy.yml -l nginxplus-lb -i ./inventory.yml --ask-vault-pass`
 
 ### Deploy ssl termination server (tls01&tls02)
 `ansible-playbook ./base.yml -l nginxplus-tls -i ./inventory.yml --ask-vault-pass`
 
-`ansible nginxplus-tls -i ./inventory.yml -m shell -a "/sbin/shutdown -r now" --ask-vault-pass`
+`ansible nginxplus-tls -i ./inventory.yml -m reboot -b`
 
 `ansible-playbook ./ansible-nginxplus-tls/deploy.yml -l nginxplus-tls -i ./inventory.yml --ask-vault-pass`
 
@@ -37,10 +40,10 @@ Required package on WSL/Ubuntu: certbot python3-certbot-nginx
 
 ## PowerCLI
 
-`foreach($vm in "web01", "web02", "lb01", "tls01", "tls02"){Get-VM $vm}`
+`foreach($vm in "web01", "web02", "lb01", "tls01", "tls02", "ctl01"){Get-VM $vm}`
 
-`foreach($vm in "web01", "web02", "lb01", "tls01", "tls02"){Start-VM -VM $vm -Confirm:$false}`
+`foreach($vm in "web01", "web02", "lb01", "tls01", "tls02", "ctl01"){Start-VM -VM $vm -Confirm:$false}`
 
-`foreach($vm in "web01", "web02", "lb01", "tls01", "tls02"){Get-Snapshot -VM $vm | where {$_.IsCurrent -eq $true}}`
+`foreach($vm in "web01", "web02", "lb01", "tls01", "tls02", "ctl01"){Get-Snapshot -VM $vm | where {$_.IsCurrent -eq $true}}`
 
-`foreach($vm in "web01", "web02", "lb01", "tls01", "tls02"){$snap=Get-Snapshot -VM $vm | where {$_.IsCurrent -eq $true};Set-VM -VM $vm -SnapShot $snap -Confirm:$false}`
+`foreach($vm in "web01", "web02", "lb01", "tls01", "tls02", "ctl01"){$snap=Get-Snapshot -VM $vm | where {$_.IsCurrent -eq $true};Set-VM -VM $vm -SnapShot $snap -Confirm:$false}`
