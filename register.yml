@@ -1,0 +1,48 @@
+- hosts: all
+
+  vars_files:
+    - 'vars.yml'
+
+  vars:
+    fqdn: "{{ controllername }}.{{ subdomain }}"
+    baseurl: "{{ fqdn }}/api/v1"
+
+  tasks:
+  - name: Login to the controller
+    uri:
+      url: "https://{{ baseurl }}/platform/login"
+      method: POST
+      body_format: json
+      body:
+        credentials:
+          type: "BASIC"
+          username: "{{ email }}"
+          password: "{{ password }}"
+      status_code: 204
+      validate_certs: False
+    register: login
+
+  - name: get the API key from the controller
+    uri:
+      url: "https://{{ baseurl }}/platform/global"
+      headers:
+        Cookie: "{{ login.set_cookie }}"
+      status_code: 200
+      validate_certs: False
+    register: globals
+
+  - name: extract and store the API key
+    set_fact: 
+      apiKey : "{{ globals.json.currentStatus.agentSettings.apiKey }}"
+
+  - name: retrieve the controller installer from the NGINX Controller
+    get_url:
+      dest: /tmp/install.sh
+      mode: 0750
+      url: https://{{ fqdn }}:8443/1.4/install/controller/
+      validate_certs: no
+
+  - name: Install the controller agent
+    shell:
+      cmd: "API_KEY='{{ apiKey }}' sh /tmp/install.sh -y"
+      creates: /lib/systemd/system/controller-agent.service
