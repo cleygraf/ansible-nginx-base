@@ -1,6 +1,7 @@
 - hosts: nginxplus-ws
   vars_files:
     - 'vars.yml'
+    - '../vars.yml'
 
   vars: 
     ansible_become: yes
@@ -8,4 +9,4 @@
   tasks:
     - include: 'tasks/install_nginxplus.yml'
     - include: 'tasks/copy_configurations.yml'
-    - include: 'tasks/add_upstream_conf.yml'
+#    - include: 'tasks/add_upstream_conf.yml'

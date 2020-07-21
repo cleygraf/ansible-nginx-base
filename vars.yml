@@ -8,3 +8,8 @@ lastname: Leygraf
 email: c.leygraf@f5.com
 password: "ng1nx!"
 organization: "NGINX BU at F5"
+
+nginxplus_cert_key_path: ~/nginx/certs/
+server_cert_key_path: ~/nginx/ssl/
+nginx_binary_path: ~/nginx/binaries/
+nginx_license_path: ~/nginx/licenses/

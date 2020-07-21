@@ -1,0 +1,5 @@
+- import_playbook: 'base.yml'
+- import_playbook: 'ansible-nginxplus-ws/deploy.yml'
+- import_playbook: 'ansible-nginxplus-lb/deploy.yml'
+- import_playbook: 'ansible-nginxplus-tls/deploy.yml'
+- import_playbook: 'ansible-nginxplus-ctl/deploy.yml'
