@@ -1,4 +1,4 @@
-- hosts: nginxplus-ctl
+- hosts: ctl
   vars_files:
     - 'vars.yml'
     - '../vars.yml'
