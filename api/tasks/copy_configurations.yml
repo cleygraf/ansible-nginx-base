@@ -1,0 +1,38 @@
+- name: copy nginx-plus configuration file default.conf
+  template: src=templates/etc/nginx/conf.d/default.conf dest=/etc/nginx/conf.d/default.conf owner=root mode=0644
+
+- name: copy nginx-plus configuration file nginx.conf
+  template: src=templates/etc/nginx/nginx.conf dest=/etc/nginx/nginx.conf owner=root mode=0644
+
+- name: copy nginx-plus configuration file nginx-plus-api.conf
+  template: src=templates/etc/nginx/conf.d/nginx-plus-api.conf dest=/etc/nginx/conf.d/nginx-plus-api.conf owner=root mode=0644
+
+- name: copy nginx-plus configuration file redirect.conf
+  template: src=templates/etc/nginx/conf.d/redirect.conf dest=/etc/nginx/conf.d/redirect.conf owner=root mode=0644
+
+# - name: create directory for cert and key
+#   file: path=/etc/ssl/certs state=directory group=root mode=0755
+
+- name: copy server.crt
+  copy: src={{ server_cert_key_path }}server_crt.txt dest=/etc/ssl/certs/server.crt owner=root group=root mode=0644
+  
+- name: copy server.key
+  copy: src={{ server_cert_key_path }}server_key.txt dest=/etc/ssl/certs/server.key owner=root group=root mode=0644
+
+- name: copy keepalived.conf of tls01
+  copy: src=templates/etc/keepalived/keepalived_tls01.conf dest=/etc/keepalived/keepalived.conf owner=root group=root mode=0644
+  when: inventory_hostname == "tls01"
+
+- name: copy keepalived.conf of tls02
+  copy: src=templates/etc/keepalived/keepalived_tls02.conf dest=/etc/keepalived/keepalived.conf owner=root group=root mode=0644
+  when: inventory_hostname == "tls02"
+
+- name: reload nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: reload keepalived
+  service:
+    name: keepalived
+    state: restarted
