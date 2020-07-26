@@ -2,40 +2,47 @@
   yum:
     name: jq
     state: latest
-
+  become: yes
+  
 - name: install yum-plugin-versionlock
   yum:
     name: yum-plugin-versionlock
     state: latest
+  become: yes
+  
 
-# - name: "unpack controller-installer-{{ c3version }}.tar.gz to /tmp"
-#   unarchive:
-#     src: "{{ nginx_binary_path }}/controller-installer-{{ c3version }}.tar.gz"
-#     dest: "/tmp"
-#     remote_src: no
+- name: "unpack controller-installer-{{ c3version }}.tar.gz to /tmp"
+  unarchive:
+    src: "{{ nginx_binary_path }}/controller-installer-{{ c3version }}.tar.gz"
+    dest: "/tmp"
+    remote_src: no
 
 - name: temporary disable swap
   shell: "/usr/sbin/swapoff -a"
+  become: yes
   
-- name: "Example1: Validate if a String or line is present in the file"
+  
+- name: "remove swap from /etc/fstab"
   lineinfile:
     path: /etc/fstab
     regexp: '\s+swap\s+swap\s+'
     state: absent
     backup: yes
+  become: yes
+  
 
-# - name: install controller
-#   shell: > 
-#     ./install.sh 
-#     -n -c -w -y
-#     --smtp-host localhost --smtp-port 25 --smtp-authentication false --smtp-use-tls false --noreply-address "no-reply@{{ subdomain }}"
-#     --admin-firstname "{{ firstname }}" --admin-lastname "{{ lastname }}" --admin-email "{{ email }}" --admin-password "{{ password }}"
-#     --fqdn "{{ inventory_hostname_short }}.{{ subdomain }}" --organization-name "{{ organization }}"
-#     --tsdb-volume-type local
-#   args:
-#     chdir: "/tmp/controller-installer"
-#   become: no
-#   register: controller_output
+- name: install controller
+  shell: > 
+    ./install.sh 
+    -n -c -w -y
+    --smtp-host localhost --smtp-port 25 --smtp-authentication false --smtp-use-tls false --noreply-address "no-reply@{{ subdomain }}"
+    --admin-firstname "{{ firstname }}" --admin-lastname "{{ lastname }}" --admin-email "{{ email }}" --admin-password "{{ password }}"
+    --fqdn "{{ inventory_hostname_short }}.{{ subdomain }}" --organization-name "{{ organization }}"
+    --tsdb-volume-type local
+  args:
+    chdir: "/tmp/controller-installer"
+  become: no
+  register: controller_output
 
 - name: login to the controller
   uri:
