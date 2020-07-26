@@ -11,7 +11,8 @@
   - name: set hostname according inventory variable
     shell: "hostnamectl set-hostname {{new_hostname}}"
     when: ( new_hostname is defined ) and ( ansible_facts['nodename'] != new_hostname )
- 
+    register: renamed_host
+
   - name: install epel-release
     yum:
       name: epel-release
@@ -34,7 +35,7 @@
       enabled: no
       state: stopped
 
-  - name: Add IP address of all hosts to all hosts
+  - name: add IP address of all hosts to all hosts
     lineinfile:
       dest: /etc/hosts
       regexp: '.*{{ item }}$'
@@ -42,3 +43,7 @@
       state: present
     when: hostvars[item].ansible_ssh_host is defined
     with_items: "{{ groups.all }}"
+
+  - name: restart host if required
+    reboot:
+    when: renamed_host.changed|bool == True
