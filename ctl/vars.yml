@@ -1,2 +1,6 @@
 baseurl: "{{ inventory_hostname_short }}.{{ subdomain }}/api/v1"
 c3version: "3.6.0"
+
+location: "unspecified"
+env: "lab"
+proxy: "lb01.home.local"
