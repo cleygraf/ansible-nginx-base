@@ -1,0 +1,9 @@
+---
+# file: roles/ctl-setup/vars/main.yml
+
+baseurl: "{{ inventory_hostname_short }}.{{ subdomain }}/api/v1"
+c3version: "3.6.0"
+
+location: "unspecified"
+env: "lab"
+proxy: "lb01"

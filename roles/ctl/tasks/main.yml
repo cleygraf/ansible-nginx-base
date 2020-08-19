@@ -1,0 +1,5 @@
+---
+# file: roles/ctl/tasks/main.yml
+
+- include_tasks: install_nginxctl.yml
+

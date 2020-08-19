@@ -1,0 +1,6 @@
+---
+# file: roles/tls/tasks/main.yml
+
+- include_tasks: install_nginxplus.yml
+- include_tasks: install_keepalived.yml
+- include_tasks: copy_configurations.yml

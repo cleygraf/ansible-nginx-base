@@ -1,0 +1,5 @@
+---
+# file: roles/lb/tasks/main.yml
+
+- include_tasks: install_nginxplus.yml
+- include_tasks: copy_configurations.yml

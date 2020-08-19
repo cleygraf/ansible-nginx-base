@@ -1,5 +1,0 @@
-# here we define the NGINX Plus On-the-fly reconfiguration API
-nginxplus_api_server: "lb01:8080"
-
-# here we define the backend webserver port we want to add dynamically
-nginx_ws_port: "80"

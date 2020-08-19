@@ -1,0 +1,17 @@
+# Infrastructure
+subdomain: home.local
+controllername: ctl01
+
+# User details for NGINX controller
+firstname: Christoph
+lastname: Leygraf
+email: c.leygraf@f5.com
+password: "ng1nx!"
+organization: "NGINX BU at F5"
+country: "DE"
+
+# Paths to binaries, certs ...
+nginxplus_cert_key_path: ~/nginx/certs/
+server_cert_key_path: ~/nginx/ssl/
+nginx_binary_path: ~/nginx/binaries/
+nginx_license_path: ~/nginx/licenses/

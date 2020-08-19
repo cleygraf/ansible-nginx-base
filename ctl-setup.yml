@@ -1,0 +1,7 @@
+---
+# file: ctl-setup.yml
+
+- hosts: ctl
+
+  roles:
+    - role: ctl-setup

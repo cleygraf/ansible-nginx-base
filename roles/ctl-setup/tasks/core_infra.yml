@@ -1,0 +1,167 @@
+---
+# file: roles/ctl-setup/tasks/core_infra.yml
+
+- name: Login to the controller
+  uri:
+    url: "https://{{ baseurl }}/platform/login"
+    method: POST
+    body_format: json
+    body:
+      credentials:
+        type: "BASIC"
+        username: "{{ email }}"
+        password: "{{ password }}"
+    status_code: 204
+    validate_certs: False
+  register: login
+
+# create an env, to be passed in with the playbook using -e
+
+# env
+- name: check if environment already exists
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ env }}"
+    method: GET
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+
+    body_format: json
+    status_code: 200, 404
+    validate_certs: False
+  register: check_environment
+
+- name: Output of last task
+  debug:
+    var: 
+      check_environment.status
+
+- name: create environment
+  uri:
+    url: "https://{{ baseurl }}/services/environments"
+    method: POST
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body:
+      metadata:
+        name: "{{ env }}"
+        displayName: "{{ env }} environment"
+        description: "{{ env }} environment on {{ location }} infrastructure"
+
+    status_code: 201
+    validate_certs: False
+  when: check_environment.status != 200
+
+- name: generate private key
+  local_action:
+    module: openssl_privatekey
+    path: "{{ server_cert_key_path }}/privatekey.pem"
+    size: 2048
+    type: RSA
+  register: privatekey
+
+
+- name: create and csrs
+  local_action:
+    module: openssl_csr
+    path: "{{ server_cert_key_path }}/wildcard_{{ env }}_csr.pem"
+    privatekey_path: "{{ privatekey.filename }}"
+    organization_name: "{{ organization }}"
+    common_name: "*.{{ env }}.{{ subdomain }}"
+    country_name: "{{ country }}"
+  register: csr
+
+- name: generate certificate 
+  local_action:
+    module: openssl_certificate
+    path: "{{ server_cert_key_path }}/wildcard_{{ env }}_cert.pem"
+    privatekey_path: "{{ privatekey.filename }}"
+    csr_path: "{{ server_cert_key_path }}/wildcard_{{ env }}_csr.pem"
+    provider: selfsigned
+
+- name: upload certificate
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ env }}/certs/{{ env }}_wildcard"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body:
+      metadata:
+        name: "{{ env }}_wildcard"
+      desiredState:
+        type: PEM
+        privateKey: "{{ lookup( 'file', '{{ privatekey.filename }}') }}"
+        publicCert: "{{ lookup( 'file', '{{ server_cert_key_path }}/wildcard_{{ env }}_cert.pem' ) }}"
+        caCerts: []
+    status_code: 200,201
+    validate_certs: False
+
+- name: cleanup csrs and certs.
+  local_action:
+    module: file
+    path: "{{ item }}"
+    state: absent
+  with_fileglob:
+    - "{{ server_cert_key_path }}/wildcard*"
+
+# gateway
+- name: check if gateway already exists
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ env }}/gateways/{{ env }}-wildcard-gw"
+    method: GET
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+
+    body_format: json
+    status_code: 200, 404
+    validate_certs: False
+  register: check_gateway
+
+- name: Output of last task
+  debug:
+    var: 
+      check_gateway.status
+
+- name: create a wildcard gateway
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ env }}/gateways"
+    method: POST
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      { "metadata": { "name": "{{ env }}-wildcard-gw" },
+        "desiredState": {
+          "ingress": {
+            "uris": {
+              "http://*.{{ env }}.{{ subdomain }}": {},
+              "https://*.{{ env }}.{{ subdomain }}": {
+                "tls": {
+                  "certRef": {
+                    "ref": "/services/environments/{{ env }}/certs/{{ env}}_wildcard"
+                  },
+                  "protocols": [
+                    "TLSv1.2",
+                    "TLSv1.3"
+                  ],
+                  "preferServerCipher": "ENABLED"
+                }
+              }
+            },
+            "placement": {
+              "instanceRefs": [ { "ref": "/infrastructure/locations/{{ location }}/instances/{{ proxy }}" } ] 
+            },
+            "tls": {
+              "certRef": {
+                "ref": "/services/environments/{{ env }}/certs/{{ env }}_wildcard"
+              },
+              "preferServerCipher": "DISABLED"
+            } 
+          }
+        }
+      }
+    status_code: 202
+    validate_certs: False
+  when: check_gateway.status != 200
+

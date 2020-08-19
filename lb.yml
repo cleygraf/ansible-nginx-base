@@ -1,0 +1,11 @@
+---
+# file: lb.yml
+
+- hosts: lb
+
+  roles:
+    - role: common
+      become: yes
+
+    - role: lb
+      become: yes

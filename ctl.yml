@@ -1,0 +1,10 @@
+---
+# file: ctl.yml
+
+- hosts: ctl
+
+  roles:
+    - role: common
+      become: yes
+
+    - role: ctl

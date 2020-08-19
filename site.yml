@@ -1,0 +1,9 @@
+---
+# file: site.yml
+
+- import_playbook: ws.yml
+- import_playbook: lb.yml
+- import_playbook: tls.yml
+- import_playbook: ctl.yml
+- import_playbook: ctl-register.yml
+- import_playbook: ctl-setup.yml

@@ -1,0 +1,12 @@
+---
+# file: roles/ws/vars/main.yml
+
+#
+# Variables used by task add_upstream_comf.yml
+# 
+
+# NGINX+ reconfiguration API endpoint
+nginxplus_api_server: "lb01.{{ subdomain }}:8080"
+
+# backend ws port
+nginx_ws_port: "80"

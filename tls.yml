@@ -1,0 +1,11 @@
+---
+# file: tls.yml
+
+- hosts: tls
+
+  roles:
+    - role: common
+      become: yes
+
+    - role: tls
+      become: yes

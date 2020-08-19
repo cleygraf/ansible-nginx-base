@@ -1,0 +1,6 @@
+---
+# file: roles/ctl-setup/tasks/main.yml
+
+- include_tasks: user_roles.yml
+- include_tasks: core_infra.yml
+
