@@ -17,10 +17,10 @@
       state: latest
       update_cache: yes
 
-  - name: install net-tools (netstat, ...)
-    yum:
-      name: net-tools
-      state: latest
+  # - name: install net-tools (netstat, ...)
+  #   yum:
+  #     name: net-tools
+  #     state: latest
 
   - name: disable and stop firewalld
     service:
