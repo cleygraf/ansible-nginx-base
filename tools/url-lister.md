@@ -1,6 +1,6 @@
 # url-lister.sh
 
-This script lists the urls of the missing packages (incl. dependecies) required to run NGINX controller on CENTOS. It is ment to be used together with the offline installer file for NGINX controller. The urls can be used to download the packages on another machine, transfer them to a target server and install them there.
+This script lists the urls of the missing packages (incl. dependecies) required to run NGINX controller on CENTOS. It is ment to be used together with the offline installer file for NGINX controller. The urls can be used to download the packages on another machine, transfer them to the target server and install them there.
 
 A part of the packages (jq, kubernetes-cni, cri-tools, kubelet, kubectl, kubeadm) are already part of the offline installer archive (path: controller-installer/files/packages/rpm/). 
 
