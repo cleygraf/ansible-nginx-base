@@ -1,0 +1,38 @@
+---
+# file: roles/api/tasks/prerequisites.yml
+
+- name: Import Docker CE repository gpg key
+  rpm_key:
+    key: https://download.docker.com/linux/centos/gpg
+    state: present
+  become: true
+
+- name: Add Docker CE repository
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+
+- name: Install Docker CE
+  yum:
+    name: docker-ce
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Start service docker, if not started
+  service:
+    name: docker
+    state: started
+  become: true
+
+- name: Install python-docker
+  yum:
+    name: python36-docker
+    state: present
+  become: true
+

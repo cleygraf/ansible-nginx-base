@@ -12,6 +12,13 @@ lb:
     lb01:
       new_hostname: lb01.home.local
       ansible_ssh_host: 192.168.1.111
+      additional_dns_aliases: "petstore.lab.home.local nginx.lab.home.local"
+
+api:
+  hosts:
+    api01:
+      new_hostname: api01.home.local
+      ansible_ssh_host: 192.168.1.115
 
 tls:
   hosts:

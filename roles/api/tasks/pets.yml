@@ -1,0 +1,19 @@
+---
+#file: roles/api/tasks/pets.yml
+
+- name: Pull an petshop image
+  docker_image:
+    name: swaggerapi/petstore
+    source: pull
+  become: true
+  
+- name: Start a petshop container
+  docker_container:
+    name: petshop
+    image: swaggerapi/petstore
+    state: started
+    ports:
+     - "3001:8080"
+  become: true
+
+

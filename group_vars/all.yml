@@ -6,7 +6,7 @@ controllername: ctl01
 firstname: Christoph
 lastname: Leygraf
 email: c.leygraf@f5.com
-password: "ng1nx!"
+password: "F5Ng1nx!"
 organization: "NGINX BU at F5"
 country: "DE"
 
@@ -15,3 +15,13 @@ nginxplus_cert_key_path: ~/nginx/certs/
 server_cert_key_path: ~/nginx/ssl/
 nginx_binary_path: ~/nginx/binaries/
 nginx_license_path: ~/nginx/licenses/
+
+# Default hosts file to manipulate
+hostsfile: "/etc/hosts"
+
+# Additional hosts
+additional_hosts:
+  tls:
+    additional_hosts_ip: 192.168.1.114
+#    additional_host_dns_aliases: "gw.home.local"
+

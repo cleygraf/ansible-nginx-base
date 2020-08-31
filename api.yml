@@ -1,0 +1,10 @@
+---
+# file: api.yml
+
+- hosts: api
+
+  roles:
+    - role: common
+      become: yes
+
+    - role: api

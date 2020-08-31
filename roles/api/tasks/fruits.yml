@@ -1,0 +1,19 @@
+---
+#file: roles/api/tasks/fruits.yml
+
+- name: Pull an fruitshop image
+  docker_image:
+    name: bkimminich/juice-shop
+    source: pull
+  become: true
+
+- name: Start a fruitshop container
+  docker_container:
+    name: fruitshop
+    image: bkimminich/juice-shop
+    state: started
+    ports:
+     - "3000:3000"
+  become: true
+
+
