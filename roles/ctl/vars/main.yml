@@ -3,6 +3,9 @@
 
 baseurl: "{{ inventory_hostname_short }}.{{ subdomain }}/api/v1"
 c3version: "3.6.0"
+#controllefile: "controller-installer-{{ c3version }}.tar.gz"
+offlinebuild: "2178786"
+controllerfile: "offline-controller-installer-{{ offlinebuild }}.tar.gz"
 
 location: "unspecified"
 env: "lab"
