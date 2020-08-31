@@ -6,4 +6,4 @@ c3version: "3.6.0"
 
 location: "unspecified"
 env: "lab"
-proxy: "lb01"
+proxy: "lb01.{{ subdomain }}"

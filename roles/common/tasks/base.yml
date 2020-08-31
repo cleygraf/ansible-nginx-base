@@ -1,0 +1,37 @@
+---
+# file: roles/common/task/base.yml
+
+  - name: set hostname according inventory variable
+    shell: "hostnamectl set-hostname {{new_hostname}}"
+    when: ( new_hostname is defined ) and ( ansible_facts['nodename'] != new_hostname )
+    register: renamed_host
+
+  - name: install epel-release
+    yum:
+      name: epel-release
+      state: latest
+
+  - name: install updates
+    yum: 
+      name: "*" 
+      state: latest
+      update_cache: yes
+
+  - name: install net-tools (netstat, ...)
+    yum:
+      name: net-tools
+      state: latest
+
+  - name: Disable SELinux
+    selinux:
+      state: disabled
+
+  - name: disable and stop firewalld
+    service:
+      name: firewalld
+      enabled: no
+      state: stopped
+
+  - name: restart host if required
+    reboot:
+    when: renamed_host.changed|bool == True
