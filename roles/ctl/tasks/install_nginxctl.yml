@@ -1,19 +1,16 @@
-- name: install jq
+- name: install required packages
   yum:
-    name: jq
+    name: 
+      - jq
+      - yum-plugin-versionlock
+      - socat
+      - conntrack-tools
     state: latest
   become: yes
   
-- name: install yum-plugin-versionlock
-  yum:
-    name: yum-plugin-versionlock
-    state: latest
-  become: yes
-  
-
-- name: "unpack controller-installer-{{ c3version }}.tar.gz to /tmp"
+- name: "unpack {{ controllerfile }} to /tmp"
   unarchive:
-    src: "{{ nginx_binary_path }}/controller-installer-{{ c3version }}.tar.gz"
+    src: "{{ nginx_binary_path }}/{{ controllerfile }}"
     dest: "/tmp"
     remote_src: no
 
