@@ -20,6 +20,9 @@ packages=(
 # EPEL repository
 yum install epel-release
 
+# yum utilities
+yum install -y -q yum-utils 2>/dev/null
+
 # Google's k8s repository
 tee -a /etc/yum.repos.d/kubernetes.repo <<EOF 1>/dev/null
 [kubernetes]
@@ -33,8 +36,6 @@ EOF
 
 # Docker CE repository
 yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-
-yum install -y -q yum-utils 2>/dev/null
 
 echo ""
 echo "Fetch the following files:"
