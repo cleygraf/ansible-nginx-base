@@ -1,6 +1,8 @@
 # Infrastructure
 subdomain: home.local
 controllername: ctl01
+gwhostname: lb01
+gwadditionalhostnames: "petstore.lab.home.local juiceshop.lab.home.local devportal.lab.home.local www.lab.home.local"
 
 # User details for NGINX controller
 firstname: Christoph
