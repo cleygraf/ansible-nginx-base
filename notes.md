@@ -47,3 +47,6 @@ Required package on WSL/Ubuntu: certbot python3-certbot-nginx
 `foreach($vm in "ws01", "ws02", "lb01", "tls01", "tls02", "ctl01", "api01"){Get-Snapshot -VM $vm | where {$_.IsCurrent -eq $true}}`
 
 `foreach($vm in "ws01", "ws02", "lb01", "tls01", "tls02", "ctl01", "api01"){$snap=Get-Snapshot -VM $vm | where {$_.IsCurrent -eq $true};Set-VM -VM $vm -SnapShot $snap -Confirm:$false}`
+
+## /etc/hosts on localhost
+`ansible-playbook --connection=local ./tools/hosts.yml`
