@@ -106,9 +106,9 @@
     - "{{ server_cert_key_path }}/wildcard*"
 
 # gateway
-- name: check if gateway already exists
+- name: check if gateways already exists
   uri:
-    url: "https://{{ baseurl }}/services/environments/{{ env }}/gateways/{{ env }}-wildcard-gw"
+    url: "https://{{ baseurl }}/services/environments/{{ env }}/gateways/{{ item }}-gw"
     method: GET
     headers:
       Cookie: "{{ login.set_cookie }}"
@@ -116,14 +116,19 @@
     body_format: json
     status_code: 200, 404
     validate_certs: False
+  loop:
+    - "www.lab.home.local"
+    - "devportal.lab.home.local"
+    - "juiceshop.lab.home.local"
+    - "petstore.lab.home.local"
   register: check_gateway
 
 - name: Output of last task
   debug:
     var: 
-      check_gateway.status
+      check_gateway
 
-- name: create a wildcard gateway
+- name: create gateways
   uri:
     url: "https://{{ baseurl }}/services/environments/{{ env }}/gateways"
     method: POST
@@ -131,12 +136,12 @@
       Cookie: "{{ login.set_cookie }}"
     body_format: json
     body: >
-      { "metadata": { "name": "{{ env }}-wildcard-gw" },
+      { "metadata": { "name": "{{ item.item }}-gw" },
         "desiredState": {
           "ingress": {
             "uris": {
-              "http://*.{{ env }}.{{ subdomain }}": {},
-              "https://*.{{ env }}.{{ subdomain }}": {
+              "http://{{ item.item }}": {},
+              "https://{{ item.item }}": {
                 "tls": {
                   "certRef": {
                     "ref": "/services/environments/{{ env }}/certs/{{ env}}_wildcard"
@@ -163,5 +168,6 @@
       }
     status_code: 202
     validate_certs: False
-  when: check_gateway.status != 200
+  when: item.status != 200
+  loop: "{{ check_gateway.results }}"
 
