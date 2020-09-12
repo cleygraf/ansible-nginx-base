@@ -48,4 +48,4 @@
     - { firstname: 'Paula', lastname: 'Elliot', team: 'App Owner', title: 'manager', password: 'Ng1nx123' }
     - { firstname: 'April', lastname: 'Flynn', team: 'Support', title: 'engineer',  password: 'Ng1nx123' }
     - { firstname: 'Mike', lastname: 'Gibbons', team: 'Net Ops', title: 'manager', password: 'Ng1nx123' }
-
+  ignore_errors: yes
