@@ -1,7 +1,7 @@
 ---
-#file: roles/api/tasks/fruits.yml
+#file: roles/api/tasks/juice.yml
 
-- name: Pull an fruitshop image
+- name: Pull an juiceshop image
   docker_image:
     name: bkimminich/juice-shop
     source: pull
@@ -9,7 +9,7 @@
 
 - name: Start a fruitshop container
   docker_container:
-    name: fruitshop
+    name: juiceshop
     image: bkimminich/juice-shop
     state: started
     ports:
