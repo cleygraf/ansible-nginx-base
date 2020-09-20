@@ -117,10 +117,10 @@
     status_code: 200, 404
     validate_certs: False
   loop:
-    - "www.lab.home.local"
-    - "devportal.lab.home.local"
-    - "juiceshop.lab.home.local"
-    - "petstore.lab.home.local"
+D    - "www.lab.leyux.org"
+    - "devportal.lab.leyux.org"
+    - "juiceshop.lab.leyux.org"
+    - "petstore.lab.leyux.org"
   register: check_gateway
 
 - name: Output of last task

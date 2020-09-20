@@ -1,8 +1,8 @@
 # Infrastructure
-subdomain: home.local
+subdomain: lab.leyux.org
 controllername: ctl01
 gwhostname: lb01
-gwadditionalhostnames: "petstore.lab.home.local juiceshop.lab.home.local devportal.lab.home.local www.lab.home.local"
+gwadditionalhostnames: "petstore.lab.leyux.org juiceshop.lab.leyux.org devportal.lab.leyux.org www.lab.leyux.org"
 
 # User details for NGINX controller
 firstname: Christoph
@@ -25,5 +25,5 @@ hostsfile: "/etc/hosts"
 additional_hosts:
   tls:
     additional_hosts_ip: 192.168.1.114
-#    additional_host_dns_aliases: "gw.home.local"
+#    additional_host_dns_aliases: "gw.lab.leyux.org"
 

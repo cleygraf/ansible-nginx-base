@@ -1,36 +1,36 @@
 ws:
   hosts:
     ws01:
-      new_hostname: ws01.home.local
+      new_hostname: ws01.lab.leyux.org
       ansible_ssh_host: 192.168.1.101
     ws02:
-      new_hostname: ws02.home.local
+      new_hostname: ws02.lab.leyux.org
       ansible_ssh_host: 192.168.1.102
 
 lb:
   hosts:
     lb01:
-      new_hostname: lb01.home.local
+      new_hostname: lb01.lab.leyux.org
       ansible_ssh_host: 192.168.1.111
 
 api:
   hosts:
     api01:
-      new_hostname: api01.home.local
+      new_hostname: api01.lab.leyux.org
       ansible_ssh_host: 192.168.1.115
 
 tls:
   hosts:
     tls01:
-      new_hostname: tls01.home.local
+      new_hostname: tls01.lab.leyux.org
       ansible_ssh_host: 192.168.1.112
     tls02:
-      new_hostname: tls02.home.local
+      new_hostname: tls02.lab.leyux.org
       ansible_ssh_host: 192.168.1.113
 
 ctl:
   hosts:
     ctl01:
-      new_hostname: ctl01.home.local
+      new_hostname: ctl01.lab.leyux.org
       ansible_ssh_host: 192.168.1.119
       

@@ -32,10 +32,10 @@ I prefer to include as much as possible in the git repository. So I have added a
 nginxplus-tls:
   hosts:
     tls01:
-      new_hostname: tls01.home.local
+      new_hostname: tls01.lab.leyux.org
       ansible_ssh_host: 192.168.1.112
     tls02:
-      new_hostname: tls02.home.local
+      new_hostname: tls02.lab.leyux.org
       ansible_ssh_host: 192.168.1.113
   vars:
     ansible_become: yes
