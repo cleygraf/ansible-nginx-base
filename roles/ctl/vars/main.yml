@@ -1,10 +1,13 @@
 ---
 # file: roles/ctl/vars/main.yml
 
-baseurl: "{{ inventory_hostname_short }}.{{ subdomain }}/api/v1"
+baseurl: "{{ controllername }}.{{ subdomain }}/api/v1"
 c3version: "3.6.0"
-#controllefile: "controller-installer-{{ c3version }}.tar.gz"
-offlinebuild: "2182317"
+# controllerfile: "controller-installer-{{ c3version }}.tar.gz"
+
+# offlinebuild: "2182317" # 3.8
+# offlinebuild: "2268263" # 3.9RC2
+offlinebuild: "2286944" # 3.9RC3      
 controllerfile: "offline-controller-installer-{{ offlinebuild }}.tar.gz"
 
 location: "unspecified"
