@@ -32,7 +32,7 @@
 
 - name: Install python-docker
   yum:
-    name: python36-docker
+    name: python-docker-py
     state: present
   become: true
 
