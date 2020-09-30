@@ -15,27 +15,66 @@
     validate_certs: False
   register: login
 
-# create an env, to be passed in with the playbook using -e
-
-# env
-- name: check if environment already exists
+# Locations
+- name: Check locations
   uri:
-    url: "https://{{ baseurl }}/services/environments/{{ env }}"
-    method: GET
+    url: "https://{{ baseurl }}/infrastructure/locations"
+    method: get
     headers:
       Cookie: "{{ login.set_cookie }}"
-
     body_format: json
     status_code: 200, 404
     validate_certs: False
-  register: check_environment
+  loop:
+    - "emea"
+    - "us"
+    - "aws"
+    - "azure"
+    - "gcp"
+  register: check_locations
 
-- name: Output of last task
-  debug:
-    var: 
-      check_environment.status
+- name: Create locations
+  uri:
+    url: "https://{{ baseurl }}/infrastructure/locations"
+    method: POST
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body:
+      metadata:
+        name: "local"
+        displayName: "{{ item.item }}"
+        description: "Multipass environment"
+      desiredState:
+        type: "OTHER_LOCATION"
+    status_code: 201
+    validate_certs: False
+  when: item.status != 200
+  loop: "{{ check_locations.results }}"
 
-- name: create environment
+# Environments
+- name: Check environments
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ item }}"
+    method: GET
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    status_code: 200, 404
+    validate_certs: False
+  loop:
+    - "lab"
+    - "dev"
+    - "test"
+    - "prod"
+  register: check_environments
+
+# - name: Output of last task
+#   debug:
+#     var: 
+#       check_environments.status
+
+- name: Create environments
   uri:
     url: "https://{{ baseurl }}/services/environments"
     method: POST
@@ -44,42 +83,62 @@
     body_format: json
     body:
       metadata:
-        name: "{{ env }}"
-        displayName: "{{ env }} environment"
-        description: "{{ env }} environment on {{ location }} infrastructure"
+        name: "{{ item.item }}"
+        displayName: "{{ item.item }} environment"
+        description: "{{ item.item }} environment on {{ item.item }} infrastructure"
 
     status_code: 201
     validate_certs: False
-  when: check_environment.status != 200
+  when: item.status != 200
+  loop: "{{ check_environments.results }}"
 
-- name: generate private key
-  local_action:
-    module: openssl_privatekey
-    path: "{{ server_cert_key_path }}/privatekey.pem"
-    size: 2048
-    type: RSA
-  register: privatekey
+# - name: generate private key
+#   local_action:
+#     module: openssl_privatekey
+#     path: "{{ server_cert_key_path }}/privatekey.pem"
+#     size: 2048
+#     type: RSA
+#   register: privatekey
 
+# Generate self signed certificate and uplod
+# - name: create and csrs
+#   local_action:
+#     module: openssl_csr
+#     path: "{{ server_cert_key_path }}/wildcard_{{ env }}_csr.pem"
+#     privatekey_path: "{{ privatekey.filename }}"
+#     organization_name: "{{ organization }}"
+#     common_name: "*.{{ env }}.{{ subdomain }}"
+#     country_name: "{{ country }}"
+#   register: csr
 
-- name: create and csrs
-  local_action:
-    module: openssl_csr
-    path: "{{ server_cert_key_path }}/wildcard_{{ env }}_csr.pem"
-    privatekey_path: "{{ privatekey.filename }}"
-    organization_name: "{{ organization }}"
-    common_name: "*.{{ env }}.{{ subdomain }}"
-    country_name: "{{ country }}"
-  register: csr
+# - name: generate certificate 
+#   local_action:
+#     module: openssl_certificate
+#     path: "{{ server_cert_key_path }}/wildcard_{{ env }}_cert.pem"
+#     privatekey_path: "{{ privatekey.filename }}"
+#     csr_path: "{{ server_cert_key_path }}/wildcard_{{ env }}_csr.pem"
+#     provider: selfsigned
 
-- name: generate certificate 
-  local_action:
-    module: openssl_certificate
-    path: "{{ server_cert_key_path }}/wildcard_{{ env }}_cert.pem"
-    privatekey_path: "{{ privatekey.filename }}"
-    csr_path: "{{ server_cert_key_path }}/wildcard_{{ env }}_csr.pem"
-    provider: selfsigned
+# - name: Upload certificate
+#   uri:
+#     url: "https://{{ baseurl }}/services/environments/{{ env }}/certs/{{ env }}_wildcard"
+#     method: PUT
+#     headers:
+#       Cookie: "{{ login.set_cookie }}"
+#     body_format: json
+#     body:
+#       metadata:
+#         name: "{{ env }}_wildcard"
+#       desiredState:
+#         type: PEM
+#         privateKey: "{{ lookup( 'file', '{{ privatekey.filename }}') }}"
+#         publicCert: "{{ lookup( 'file', '{{ server_cert_key_path }}/wildcard_{{ env }}_cert.pem' ) }}"
+#         caCerts: []
+#     status_code: 200,201
+#     validate_certs: False
 
-- name: upload certificate
+# Upload certificate
+- name: Upload certificate
   uri:
     url: "https://{{ baseurl }}/services/environments/{{ env }}/certs/{{ env }}_wildcard"
     method: PUT
@@ -91,8 +150,8 @@
         name: "{{ env }}_wildcard"
       desiredState:
         type: PEM
-        privateKey: "{{ lookup( 'file', '{{ privatekey.filename }}') }}"
-        publicCert: "{{ lookup( 'file', '{{ server_cert_key_path }}/wildcard_{{ env }}_cert.pem' ) }}"
+        privateKey: "{{ lookup( 'file', '{{ certificate_path }}privkey.pem') }}"
+        publicCert: "{{ lookup( 'file', '{{ certificate_path }}cert.pem' ) }}"
         caCerts: []
     status_code: 200,201
     validate_certs: False
@@ -117,16 +176,17 @@
     status_code: 200, 404
     validate_certs: False
   loop:
-D    - "www.lab.leyux.org"
+    - "www.lab.leyux.org"
     - "devportal.lab.leyux.org"
     - "juiceshop.lab.leyux.org"
-    - "petstore.lab.leyux.org"
+    - "juiceapi.lab.leyux.org"
+    - "petapi.lab.leyux.org"
   register: check_gateway
 
-- name: Output of last task
-  debug:
-    var: 
-      check_gateway
+# - name: Output of last task
+#   debug:
+#     var: 
+#       check_gateway
 
 - name: create gateways
   uri:
