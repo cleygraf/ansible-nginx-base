@@ -1,7 +1,7 @@
 # Infrastructure
 subdomain: lab.leyux.org
-controllername: ctl01
-gwhostname: lb01
+controllername: ctl
+gwhostname: n01
 gwadditionalhostnames: "petstore.lab.leyux.org juiceshop.lab.leyux.org devportal.lab.leyux.org www.lab.leyux.org"
 
 # User details for NGINX controller
@@ -17,6 +17,7 @@ nginxplus_cert_key_path: ~/nginx/certs/
 server_cert_key_path: ~/nginx/ssl/
 nginx_binary_path: ~/nginx/binaries/
 nginx_license_path: ~/nginx/licenses/
+certificate_path: ~/letsencrypt/live/lab.leyux.org/
 
 # Default hosts file to manipulate
 hostsfile: "/etc/hosts"
