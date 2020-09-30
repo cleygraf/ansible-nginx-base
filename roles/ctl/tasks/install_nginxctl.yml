@@ -1,3 +1,7 @@
+---
+# file: roles/ctl/tasks/install_nginxctl.yml
+
+# Preparation
 - name: install required packages
   yum:
     name: 
@@ -8,17 +12,10 @@
     state: latest
   become: yes
   
-- name: "unpack {{ controllerfile }} to /tmp"
-  unarchive:
-    src: "{{ nginx_binary_path }}/{{ controllerfile }}"
-    dest: "/tmp"
-    remote_src: no
-
 - name: temporary disable swap
   shell: "/usr/sbin/swapoff -a"
   become: yes
-  
-  
+    
 - name: "remove swap from /etc/fstab"
   lineinfile:
     path: /etc/fstab
@@ -26,21 +23,47 @@
     state: absent
     backup: yes
   become: yes
-  
 
+- name: copy server.crt
+  copy: src={{ certificate_path }}fullchain.pem dest=/tmp/server.crt 
+  
+- name: copy server.key
+  copy: src={{ certificate_path }}privkey.pem dest=/tmp/server.key
+
+# Copy and unpack required files 
+- name: "unpack {{ controllerfile }} to /tmp"
+  unarchive:
+    src: "{{ nginx_binary_path }}/{{ controllerfile }}"
+    dest: "/tmp"
+    remote_src: no
+
+# Run installer
 - name: install controller
   shell: > 
     ./install.sh 
     -n -c -w -y
     --smtp-host localhost --smtp-port 25 --smtp-authentication false --smtp-use-tls false --noreply-address "no-reply@{{ subdomain }}"
     --admin-firstname "{{ firstname }}" --admin-lastname "{{ lastname }}" --admin-email "{{ email }}" --admin-password "{{ password }}"
-    --fqdn "{{ inventory_hostname_short }}.{{ subdomain }}" --organization-name "{{ organization }}"
+    --fqdn "{{ controllername }}.{{ subdomain }}" --organization-name "{{ organization }}"
     --tsdb-volume-type local
   args:
     chdir: "/tmp/controller-installer"
   become: no
   register: controller_output
 
+# - name: Delete /tmp/server.crt
+#   file:
+#     path: /tmp/server.crt
+#     state: absent
+#   become: yes
+
+# - name: Delete /tmp/server.key
+#   file:
+#     path: /tmp/server.key
+#     state: absent
+#   become: yes
+
+# Basic setup: license
 - name: login to the controller
   uri:
     url: "https://{{ baseurl }}/platform/login"
@@ -67,19 +90,5 @@
     status_code: 200
     validate_certs: False
 
-- name: Create local lab location
-  uri:
-    url: "https://{{ baseurl }}/infrastructure/locations"
-    method: POST
-    headers:
-      Cookie: "{{ login.set_cookie }}"
-    body_format: json
-    body:
-      metadata:
-        name: "local"
-        displayName: "Local Lab"
-        description: "Multipass environment"
-      desiredState:
-        type: "OTHER_LOCATION"
-    status_code: 201
-    validate_certs: False
+# - name: Enable CAS
+#   shell: /opt/nginx-controller/helper.sh setfeature AppSec true
