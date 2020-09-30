@@ -25,5 +25,5 @@
 - name: stopping NGINX Plus service
   service:
     name: nginx
-    state: stopped
-
+    state: started
+    enabled: yes
