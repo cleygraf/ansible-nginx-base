@@ -31,13 +31,10 @@
     - { firstname: 'Paula', lastname: 'Elliot', team: 'App Owner', title: 'manager', password: 'Ng1nx123' }
     - { firstname: 'April', lastname: 'Flynn', team: 'Support', title: 'engineer',  password: 'Ng1nx123' }
     - { firstname: 'Mike', lastname: 'Gibbons', team: 'Net Ops', title: 'manager', password: 'Ng1nx123' }
+  loop_control:
+    label: "{{ item.firstname | lower }}@{{ subdomain }}"
   ignore_errors: yes
   register: check_users
-
-- name: Output of last task
-  debug:
-    var: 
-      check_users
 
 - name: Create a couple of users    
   uri:
@@ -66,4 +63,6 @@
     validate_certs: False
   when: item.status != 200
   loop: "{{ check_users.results }}"
+  loop_control:
+    label: "{{ item.item.firstname | lower }}@{{ subdomain }}"
 
