@@ -15,30 +15,13 @@
     validate_certs: False
   register: login
 
-- name: create a couple of users    
+- name: Check a couple of users    
   uri:
-    url: "https://{{ baseurl }}/platform/users"
-    method: POST
+    url: "https://{{ baseurl }}/platform/users/{{ item.firstname | lower }}@{{ subdomain }}"
+    method: GET
     headers:
       Cookie: "{{ login.set_cookie }}"
-    body_format: json
-    body:
-      metadata:
-        name: "{{ item.firstname | lower }}@{{ subdomain }}"
-        tags:
-          - "{{ item.title }}"
-          - "{{ item.team }}"
-      desiredState:
-        firstName: "{{ item.firstname }}"
-        lastName: "{{ item.lastname }}"
-        email: "{{ item.firstname | lower }}@{{ subdomain }}"
-        password: "{{ item.password }}"
-        roles:
-          - links:
-              rel: /api/v1/platform/roles/guest
-              name: guest
-            ref: /platform/roles/guest
-    status_code: 200,201
+    status_code: 200,201,400,404
     validate_certs: False
   loop:
     - { firstname: 'Tony', lastname: 'Ashworth', team: 'App Dev', title: 'developer', password: 'Ng1nx123' }
@@ -49,3 +32,38 @@
     - { firstname: 'April', lastname: 'Flynn', team: 'Support', title: 'engineer',  password: 'Ng1nx123' }
     - { firstname: 'Mike', lastname: 'Gibbons', team: 'Net Ops', title: 'manager', password: 'Ng1nx123' }
   ignore_errors: yes
+  register: check_users
+
+- name: Output of last task
+  debug:
+    var: 
+      check_users
+
+- name: Create a couple of users    
+  uri:
+    url: "https://{{ baseurl }}/platform/users"
+    method: POST
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body:
+      metadata:
+        name: "{{ item.item.firstname | lower }}@{{ subdomain }}"
+        tags:
+          - "{{ item.item.title }}"
+          - "{{ item.item.team }}"
+      desiredState:
+        firstName: "{{ item.item.firstname }}"
+        lastName: "{{ item.item.lastname }}"
+        email: "{{ item.item.firstname | lower }}@{{ subdomain }}"
+        password: "{{ item.item.password }}"
+        roles:
+          - links:
+              rel: /api/v1/platform/roles/guest
+              name: guest
+            ref: /platform/roles/guest
+    status_code: 200,201
+    validate_certs: False
+  when: item.status != 200
+  loop: "{{ check_users.results }}"
+
