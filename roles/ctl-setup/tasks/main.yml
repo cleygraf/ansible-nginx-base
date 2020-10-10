@@ -3,4 +3,6 @@
 
 - include_tasks: user_roles.yml
 - include_tasks: core_infra.yml
+- include_tasks: juiceshop.yml
+- include_tasks: demo_api.yml
 
