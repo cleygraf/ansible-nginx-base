@@ -18,11 +18,10 @@
 # Locations
 - name: Check locations
   uri:
-    url: "https://{{ baseurl }}/infrastructure/locations"
+    url: "https://{{ baseurl }}/infrastructure/locations/{{ item }}"
     method: get
     headers:
       Cookie: "{{ login.set_cookie }}"
-    body_format: json
     status_code: 200, 404
     validate_certs: False
   loop:
@@ -33,6 +32,11 @@
     - "gcp"
   register: check_locations
 
+# - name: Output of last task
+#   debug:
+#     var: 
+#       check_locations
+
 - name: Create locations
   uri:
     url: "https://{{ baseurl }}/infrastructure/locations"
@@ -42,7 +46,7 @@
     body_format: json
     body:
       metadata:
-        name: "local"
+        name: "{{ item.item }}"
         displayName: "{{ item.item }}"
         description: "Multipass environment"
       desiredState:
@@ -51,6 +55,8 @@
     validate_certs: False
   when: item.status != 200
   loop: "{{ check_locations.results }}"
+  loop_control:
+    label: "{{ item.item }}"
 
 # Environments
 - name: Check environments
@@ -59,7 +65,6 @@
     method: GET
     headers:
       Cookie: "{{ login.set_cookie }}"
-    body_format: json
     status_code: 200, 404
     validate_certs: False
   loop:
@@ -68,11 +73,6 @@
     - "test"
     - "prod"
   register: check_environments
-
-# - name: Output of last task
-#   debug:
-#     var: 
-#       check_environments.status
 
 - name: Create environments
   uri:
@@ -91,6 +91,8 @@
     validate_certs: False
   when: item.status != 200
   loop: "{{ check_environments.results }}"
+  loop_control:
+    label: "{{ item.item }}"
 
 # - name: generate private key
 #   local_action:
@@ -137,6 +139,14 @@
 #     status_code: 200,201
 #     validate_certs: False
 
+# - name: cleanup csrs and certs.
+#   local_action:
+#     module: file
+#     path: "{{ item }}"
+#     state: absent
+#   with_fileglob:
+#     - "{{ server_cert_key_path }}/wildcard*"
+
 # Upload certificate
 - name: Upload certificate
   uri:
@@ -153,26 +163,16 @@
         privateKey: "{{ lookup( 'file', '{{ certificate_path }}privkey.pem') }}"
         publicCert: "{{ lookup( 'file', '{{ certificate_path }}cert.pem' ) }}"
         caCerts: []
-    status_code: 200,201
+    status_code: 200,201,500
     validate_certs: False
 
-- name: cleanup csrs and certs.
-  local_action:
-    module: file
-    path: "{{ item }}"
-    state: absent
-  with_fileglob:
-    - "{{ server_cert_key_path }}/wildcard*"
-
-# gateway
+# gateways
 - name: check if gateways already exists
   uri:
     url: "https://{{ baseurl }}/services/environments/{{ env }}/gateways/{{ item }}-gw"
     method: GET
     headers:
       Cookie: "{{ login.set_cookie }}"
-
-    body_format: json
     status_code: 200, 404
     validate_certs: False
   loop:
@@ -182,11 +182,6 @@
     - "juiceapi.lab.leyux.org"
     - "petapi.lab.leyux.org"
   register: check_gateway
-
-# - name: Output of last task
-#   debug:
-#     var: 
-#       check_gateway
 
 - name: create gateways
   uri:
@@ -230,4 +225,6 @@
     validate_certs: False
   when: item.status != 200
   loop: "{{ check_gateway.results }}"
+  loop_control:
+    label: "{{ item.item }}"
 
