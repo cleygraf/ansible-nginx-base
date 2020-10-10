@@ -2,6 +2,7 @@
 # file: ctl-setup.yml
 
 - hosts: lb
+  gather_facts: no
 
   roles:
     - role: ctl-register
