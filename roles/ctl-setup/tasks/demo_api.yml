@@ -1,0 +1,276 @@
+---
+# file: roles/ctl-setup/tasks/demo_api.yml
+
+- name: Login to the controller
+  uri:
+    url: "https://{{ baseurl }}/platform/login"
+    method: POST
+    body_format: json
+    body:
+      credentials:
+        type: "BASIC"
+        username: "{{ email }}"
+        password: "{{ password }}"
+    status_code: 204
+    validate_certs: False
+  register: login
+
+# Demo-API web app
+- name: Create/configure demo-api web app
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps/www_web"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "www_web",
+          "displayName": "",
+          "description": "",
+          "tags": []
+        },
+        "desiredState": {}
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+
+# Demo-API web app component
+- name: Create/configure demo-api web component
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps/www_web/components/www_web_comp"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "www_web_comp",
+          "tags": []
+        },
+        "desiredState": {
+          "ingress": {
+            "gatewayRefs": [
+              {
+                "ref": "/services/environments/lab/gateways/www.lab.leyux.org-gw"
+              }
+            ],
+            "uris": {
+              "/": {
+                "matchMethod": "EXACT"
+              },
+              "/dashboard": {
+                "matchMethod": "EXACT"
+              },
+              "/login": {
+                "matchMethod": "EXACT"
+              },
+              "/oidc/callback": {
+                "matchMethod": "EXACT"
+              }
+            }
+          },
+          "backend": {
+            "ntlmAuthentication": "DISABLED",
+            "preserveHostHeader": "DISABLED",
+            "workloadGroups": {
+              "flaskapp_wlg": {
+                "locationRefs": [
+                  {
+                    "ref": "/infrastructure/locations/unspecified"
+                  }
+                ],
+                "loadBalancingMethod": {
+                  "type": "ROUND_ROBIN"
+                },
+                "uris": {
+                  "http://sigw.lab.leyux.org:5000": {
+                    "isBackup": false,
+                    "isDown": false,
+                    "isDrain": false
+                  }
+                }
+              }
+            }
+          },
+          "logging": {
+            "errorLog": "DISABLED",
+            "accessLog": {
+              "state": "DISABLED"
+            }
+          },
+          "security": {}
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+
+# Demo-API demo-api
+- name: Create/configure demo-api
+  uri:
+    url: "https://{{ baseurl }}/services/api-definitions/demo-api/versions/1.0.0"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "1.0.0",
+          "displayName": "DEMO-API",
+          "description": "",
+          "tags": []
+        },
+        "desiredState": {
+          "specs": {
+            "REST": {
+              "openapi": "3.0.0",
+              "info": {
+                "license": {
+                  "name": "MIT"
+                },
+                "title": "DEMO-API",
+                "version": "1.0.0"
+              },
+              "paths": {
+                "/greet": {
+                  "x-controller-match-method": "EXACT",
+                  "get": {
+                    "summary": "Greeting",
+                    "responses": {
+                      "200": {
+                        "description": "Greeting",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "description": "unexpected error",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+
+# Demo-API demo-api publish
+- name: Publish demo-api
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps/www_web/published-apis/demo-api"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "demo-api",
+          "tags": []
+        },
+        "desiredState": {
+          "apiDefinitionVersionRef": {
+            "ref": "/services/api-definitions/demo-api/versions/1.0.0"
+          },
+          "gatewayRefs": [
+            {
+              "ref": "/services/environments/lab/gateways/www.lab.leyux.org-gw"
+            }
+          ],
+          "devportalRefs": [],
+          "basePath": "/v1",
+          "stripWorkloadBasePath": true
+        }
+      } 
+    status_code: 200, 201, 202
+    validate_certs: False
+
+# Demo-API demo-api component
+- name: Create/config demo-api component
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps/juiceshopweb_app/components/juiceshopapi_comp"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "createTime": "2020-10-10T08:43:30Z",
+          "kind": "components",
+          "links": {
+            "rel": "/api/v1/services/environments/lab/apps/juiceshopweb_app/components/juiceshopapi_comp"
+          },
+          "name": "juiceshopapi_comp",
+          "uid": "d34eb767-734a-412e-a39d-5eb714cba99d",
+          "updateTime": "2020-10-10T08:44:17Z"
+        },
+        "desiredState": {
+          "backend": {
+            "ntlmAuthentication": "DISABLED",
+            "preserveHostHeader": "DISABLED",
+            "workloadGroups": {
+              "juiceshopapi_wlg": {
+                "loadBalancingMethod": {
+                  "type": "ROUND_ROBIN"
+                },
+                "uris": {
+                  "http://api.lab.leyux.org:3000": {
+                    "isBackup": false,
+                    "isDown": false,
+                    "isDrain": false
+                  }
+                }
+              }
+            }
+          },
+          "ingress": {
+            "uris": {
+              "/orders": {
+                "matchMethod": "EXACT"
+              }
+            },
+            "gatewayRefs": [
+              {
+                "ref": "/services/environments/lab/gateways/juiceapi.lab.leyux.org-gw"
+              }
+            ]
+          },
+          "logging": {
+            "accessLog": {
+              "state": "DISABLED"
+            },
+            "errorLog": "DISABLED"
+          },
+          "publishedApiRefs": [
+            {
+              "ref": "/services/environments/lab/apps/juiceshopweb_app/published-apis/juiceshop_api"
+            }
+          ],
+          "security": {
+            "waf": {
+              "isEnabled": false
+            }
+          }
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+
