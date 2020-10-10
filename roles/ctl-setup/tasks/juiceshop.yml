@@ -1,0 +1,364 @@
+---
+# file: roles/ctl-setup/tasks/juiceshop.yml
+
+- name: Login to the controller
+  uri:
+    url: "https://{{ baseurl }}/platform/login"
+    method: POST
+    body_format: json
+    body:
+      credentials:
+        type: "BASIC"
+        username: "{{ email }}"
+        password: "{{ password }}"
+    status_code: 204
+    validate_certs: False
+  register: login
+
+# Juiceshop web app
+- name: Check juiceshop web app
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps/juiceshopweb_app"
+    method: get
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    status_code: 200, 404
+    validate_certs: False
+  register: check_juiceshopweb_app
+
+- name: Create juiceshop web app
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps"
+    method: POST
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "juiceshopweb_app",
+          "displayName": "",
+          "description": "",
+          "tags": []
+        },
+        "desiredState": {}
+      }
+    status_code: 201
+    validate_certs: False
+  when: check_juiceshopweb_app.status == 404
+
+- name: Configure juiceshop web app
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps/juiceshopweb_app"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "juiceshopweb_app",
+          "displayName": "",
+          "description": "",
+          "tags": []
+        },
+        "desiredState": {}
+      }
+    status_code: 200
+    validate_certs: False
+  when: check_juiceshopweb_app.status == 200
+
+# Juiceshop web app comp
+- name: Check juiceshop web app component
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps/juiceshopweb_app/components/juiceshopweb_comp"
+    method: get
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    status_code: 200, 404
+    validate_certs: False
+  register: check_juiceshopweb_comp
+
+- name: Create juiceshop web app component
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps/juiceshopweb_app/components"
+    method: POST
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "juiceshopweb_comp",
+          "tags": []
+        },
+        "desiredState": {
+          "ingress": {
+            "gatewayRefs": [
+              {
+                "ref": "/services/environments/lab/gateways/juiceshop.lab.leyux.org-gw"
+              }
+            ],
+            "uris": {
+              "/": {}
+            },
+            "tls": {
+              "certRef": {
+                "ref": "/services/environments/lab/certs/lab_wildcard"
+              },
+              "preferServerCipher": "DISABLED",
+              "sessionCache": "OFF"
+            }
+          },
+          "backend": {
+            "ntlmAuthentication": "DISABLED",
+            "preserveHostHeader": "DISABLED",
+            "workloadGroups": {
+              "juiceshopweb_wlg": {
+                "locationRefs": [
+                  {
+                    "ref": "/infrastructure/locations/unspecified"
+                  }
+                ],
+                "loadBalancingMethod": {
+                  "type": "ROUND_ROBIN"
+                },
+                "uris": {
+                  "http://api.lab.leyux.org:3000": {
+                    "isBackup": false,
+                    "isDown": false,
+                    "isDrain": false
+                  }
+                }
+              }
+            }
+          },
+          "logging": {
+            "errorLog": "DISABLED",
+            "accessLog": {
+              "state": "DISABLED"
+            }
+          },
+          "security": {
+            "waf": {
+              "isEnabled": true,
+              "isMonitorOnly": false
+            },
+            "strategyRef": {
+              "ref": "/services/strategies/balanced_default"
+            }
+          }
+        }
+      }
+    status_code: 201, 202
+    validate_certs: False
+  when: check_juiceshopweb_comp.status == 404
+
+- name: Configure juiceshop web app component
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps/juiceshopweb_app/components/juiceshopweb_comp"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "juiceshopweb_comp",
+          "tags": []
+        },
+        "desiredState": {
+          "ingress": {
+            "gatewayRefs": [
+              {
+                "ref": "/services/environments/lab/gateways/juiceshop.lab.leyux.org-gw"
+              }
+            ],
+            "uris": {
+              "/": {}
+            },
+            "tls": {
+              "certRef": {
+                "ref": "/services/environments/lab/certs/lab_wildcard"
+              },
+              "preferServerCipher": "DISABLED",
+              "sessionCache": "OFF"
+            }
+          },
+          "backend": {
+            "ntlmAuthentication": "DISABLED",
+            "preserveHostHeader": "DISABLED",
+            "workloadGroups": {
+              "juiceshopweb_wlg": {
+                "locationRefs": [
+                  {
+                    "ref": "/infrastructure/locations/unspecified"
+                  }
+                ],
+                "loadBalancingMethod": {
+                  "type": "ROUND_ROBIN"
+                },
+                "uris": {
+                  "http://api.lab.leyux.org:3000": {
+                    "isBackup": false,
+                    "isDown": false,
+                    "isDrain": false
+                  }
+                }
+              }
+            }
+          },
+          "logging": {
+            "errorLog": "DISABLED",
+            "accessLog": {
+              "state": "DISABLED"
+            }
+          },
+          "security": {
+            "waf": {
+              "isEnabled": true,
+              "isMonitorOnly": false
+            },
+            "strategyRef": {
+              "ref": "/services/strategies/balanced_default"
+            }
+          }
+        }
+      }
+    status_code: 200, 202
+    validate_certs: False
+  when: check_juiceshopweb_comp.status == 200
+
+# Juiceshop api
+- name: Create/configure juiceshop api
+  uri:
+    url: "https://{{ baseurl }}/services/api-definitions/juiceshopapi/versions/2.0.0"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "2.0.0",
+          "displayName": "NextGen B2B API",
+          "description": "New & secure JSON-based API for our enterprise customers. (Deprecates previously offered XML-based endpoints)",
+          "tags": []
+        },
+        "desiredState": {
+          "specs": {
+            "REST": {
+              "openapi": "3.0.0",
+              "info": {
+                "description": "New & secure JSON-based API for our enterprise customers. (Deprecates previously offered XML-based endpoints)",
+                "license": {
+                  "name": "MIT",
+                  "url": "https://opensource.org/licenses/MIT"
+                },
+                "title": "NextGen B2B API",
+                "version": "2.0.0"
+              },
+              "tags": [
+                {
+                  "description": "API for customer orders",
+                  "name": "Order"
+                }
+              ],
+              "paths": {
+                "/orders": {
+                  "x-controller-match-method": "EXACT",
+                  "post": {
+                    "summary": "Create new customer order",
+                    "description": "Create new customer order",
+                    "requestBody": {
+                      "description": "Customer order to be placed",
+                      "content": {
+                        "application/json": {
+                          "schema": {
+                            "properties": {
+                              "cid": {
+                                "example": "JS0815DE",
+                                "type": "string",
+                                "uniqueItems": true
+                              },
+                              "orderLines": {
+                                "items": {
+                                  "description": "Order line in default JSON format",
+                                  "properties": {
+                                    "customerReference": {
+                                      "example": "PO0000001",
+                                      "type": "string"
+                                    },
+                                    "productId": {
+                                      "example": 8,
+                                      "type": "integer"
+                                    },
+                                    "quantity": {
+                                      "example": 500,
+                                      "minimum": 1,
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "required": [
+                                    "productId",
+                                    "quantity"
+                                  ]
+                                },
+                                "type": "array"
+                              },
+                              "orderLinesData": {
+                                "description": "Order line(s) in customer specific JSON format",
+                                "example": "[{\"productId\": 12,\"quantity\": 10000,\"customerReference\": [\"PO0000001.2\", \"SM20180105|042\"],\"couponCode\": \"pes[Bh.u*t\"},{\"productId\": 13,\"quantity\": 2000,\"customerReference\": \"PO0000003.4\"}]",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "cid"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "responses": {
+                      "200": {
+                        "description": "New customer order is created",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "properties": {
+                                "cid": {
+                                  "example": "JS0815DE",
+                                  "type": "string",
+                                  "uniqueItems": true
+                                },
+                                "orderNo": {
+                                  "example": "3d06ac5e1bdf39d26392f8100f124742",
+                                  "type": "string",
+                                  "uniqueItems": true
+                                },
+                                "paymentDue": {
+                                  "description": "All payments are due 14 days after order placement",
+                                  "example": "2018-01-19T07:02:06.800Z",
+                                  "format": "date",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "cid",
+                                "orderNo",
+                                "paymentDue"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
