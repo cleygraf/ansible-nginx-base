@@ -24,6 +24,21 @@
     backup: yes
   become: yes
 
+# Disabling ipv6 is only necessary with controller 3.7 to 3.9. 
+# - name: set net.ipv6.conf.all.disable_ipv6 = 1
+#   sysctl:
+#     name: net.ipv6.conf.all.disable_ipv6
+#     value: '1'
+#     state: present    
+#   become: yes
+
+# - name: set net.ipv6.conf.default.disable_ipv6 = 1
+#   sysctl:
+#     name: net.ipv6.conf.default.disable_ipv6
+#     value: '1'
+#     state: present    
+#   become: yes
+
 - name: copy server.crt
   copy: src={{ certificate_path }}fullchain.pem dest=/tmp/server.crt 
   
@@ -41,10 +56,11 @@
 - name: install controller
   shell: > 
     ./install.sh 
-    -n -c -w -y
+    -n -w -y --non-interactive
     --smtp-host localhost --smtp-port 25 --smtp-authentication false --smtp-use-tls false --noreply-address "no-reply@{{ subdomain }}"
     --admin-firstname "{{ firstname }}" --admin-lastname "{{ lastname }}" --admin-email "{{ email }}" --admin-password "{{ password }}"
     --fqdn "{{ controllername }}.{{ subdomain }}" --organization-name "{{ organization }}"
+    --apigw-key /tmp/server.key --apigw-cert /tmp/server.crt
     --tsdb-volume-type local
   args:
     chdir: "/tmp/controller-installer"
@@ -90,5 +106,5 @@
     status_code: 200
     validate_certs: False
 
-# - name: Enable CAS
-#   shell: /opt/nginx-controller/helper.sh setfeature AppSec true
+- name: Enable CAS
+  shell: /opt/nginx-controller/helper.sh setfeature AppSec true
