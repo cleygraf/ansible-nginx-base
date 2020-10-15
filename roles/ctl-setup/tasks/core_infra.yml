@@ -16,13 +16,21 @@
   register: login
 
 # Locations
-- name: Check locations
+- name: Create/configure locations
   uri:
     url: "https://{{ baseurl }}/infrastructure/locations/{{ item }}"
-    method: get
+    method: PUT
     headers:
       Cookie: "{{ login.set_cookie }}"
-    status_code: 200, 404
+    body_format: json
+    body:
+      metadata:
+        name: "{{ item }}"
+        displayName: "{{ item }}"
+        description: "Multipass environment"
+      desiredState:
+        type: "OTHER_LOCATION"
+    status_code: 200,201,202
     validate_certs: False
   loop:
     - "emea"
@@ -30,69 +38,27 @@
     - "aws"
     - "azure"
     - "gcp"
-  register: check_locations
 
-# - name: Output of last task
-#   debug:
-#     var: 
-#       check_locations
-
-- name: Create locations
+# Environments
+- name: Create/configure environments
   uri:
-    url: "https://{{ baseurl }}/infrastructure/locations"
-    method: POST
+    url: "https://{{ baseurl }}/services/environments/{{ item }}"
+    method: PUT
     headers:
       Cookie: "{{ login.set_cookie }}"
     body_format: json
     body:
       metadata:
-        name: "{{ item.item }}"
-        displayName: "{{ item.item }}"
-        description: "Multipass environment"
-      desiredState:
-        type: "OTHER_LOCATION"
-    status_code: 201
-    validate_certs: False
-  when: item.status != 200
-  loop: "{{ check_locations.results }}"
-  loop_control:
-    label: "{{ item.item }}"
-
-# Environments
-- name: Check environments
-  uri:
-    url: "https://{{ baseurl }}/services/environments/{{ item }}"
-    method: GET
-    headers:
-      Cookie: "{{ login.set_cookie }}"
-    status_code: 200, 404
+        name: "{{ item }}"
+        displayName: "{{ item }} environment"
+        description: "{{ item }} environment on {{ item }} infrastructure"
+    status_code: 200,201,202
     validate_certs: False
   loop:
     - "lab"
     - "dev"
     - "test"
     - "prod"
-  register: check_environments
-
-- name: Create environments
-  uri:
-    url: "https://{{ baseurl }}/services/environments"
-    method: POST
-    headers:
-      Cookie: "{{ login.set_cookie }}"
-    body_format: json
-    body:
-      metadata:
-        name: "{{ item.item }}"
-        displayName: "{{ item.item }} environment"
-        description: "{{ item.item }} environment on {{ item.item }} infrastructure"
-
-    status_code: 201
-    validate_certs: False
-  when: item.status != 200
-  loop: "{{ check_environments.results }}"
-  loop_control:
-    label: "{{ item.item }}"
 
 # - name: generate private key
 #   local_action:
@@ -166,37 +132,21 @@
     status_code: 200,201,500
     validate_certs: False
 
-# gateways
-- name: check if gateways already exists
+# Gateways
+- name: Create/configure gateways
   uri:
     url: "https://{{ baseurl }}/services/environments/{{ env }}/gateways/{{ item }}-gw"
-    method: GET
-    headers:
-      Cookie: "{{ login.set_cookie }}"
-    status_code: 200, 404
-    validate_certs: False
-  loop:
-    - "www.lab.leyux.org"
-    - "devportal.lab.leyux.org"
-    - "juiceshop.lab.leyux.org"
-    - "juiceapi.lab.leyux.org"
-    - "petapi.lab.leyux.org"
-  register: check_gateway
-
-- name: create gateways
-  uri:
-    url: "https://{{ baseurl }}/services/environments/{{ env }}/gateways"
-    method: POST
+    method: PUT
     headers:
       Cookie: "{{ login.set_cookie }}"
     body_format: json
     body: >
-      { "metadata": { "name": "{{ item.item }}-gw" },
+      { "metadata": { "name": "{{ item }}-gw" },
         "desiredState": {
           "ingress": {
             "uris": {
-              "http://{{ item.item }}": {},
-              "https://{{ item.item }}": {
+              "http://{{ item }}": {},
+              "https://{{ item }}": {
                 "tls": {
                   "certRef": {
                     "ref": "/services/environments/{{ env }}/certs/{{ env}}_wildcard"
@@ -221,10 +171,88 @@
           }
         }
       }
-    status_code: 202
+    status_code: 200,201,202
     validate_certs: False
-  when: item.status != 200
-  loop: "{{ check_gateway.results }}"
-  loop_control:
-    label: "{{ item.item }}"
+  loop:
+    - "www.lab.leyux.org"
+    - "devportal.lab.leyux.org"
+    - "juiceshop.lab.leyux.org"
+    - "juiceapi.lab.leyux.org"
+    - "petapi.lab.leyux.org"
 
+# Developer portal
+- name: Create developer portal 
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/devportals/devportal"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "devportal",
+          "displayName": "DevPortal-LAB",
+          "tags": [],
+          "kind": "devportal"
+        },
+        "desiredState": {
+          "ingress": {
+            "gatewayRefs": [
+              {
+                "ref": "/services/environments/lab/gateways/devportal.lab.leyux.org-gw"
+              }
+            ]
+          },
+          "devPortalTheme": {
+            "customConfig": {
+              "fonts": {
+                "assignments": {
+                  "headings": {
+                    "kind": "google-web-font",
+                    "value": "Lato"
+                  },
+                  "body": {
+                    "kind": "google-web-font",
+                    "value": "Fira+Sans"
+                  },
+                  "code": {
+                    "kind": "google-web-font",
+                    "value": "IBM+Plex+Mono"
+                  },
+                  "cta": {
+                    "kind": "google-web-font",
+                    "value": "Lato"
+                  },
+                  "special": {
+                    "kind": "google-web-font",
+                    "value": "Lato"
+                  }
+                }
+              },
+              "primary": {
+                "color": {
+                  "primary": "#3b43be",
+                  "accent": "#3b43be",
+                  "fill": "#ffffff",
+                  "ink": "#171d21"
+                }
+              },
+              "secondary": {
+                "color": {
+                  "primary": "#3b43be",
+                  "accent": "#ffffff",
+                  "fill": "#f7f8fa",
+                  "ink": "#2c3039",
+                  "gray": "#272938"
+                }
+              }
+            },
+            "brandName": "NGINX+ DevPortal Demo"
+          },
+          "publishedApiRefs": [],
+          "devPortalType": "private"
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
