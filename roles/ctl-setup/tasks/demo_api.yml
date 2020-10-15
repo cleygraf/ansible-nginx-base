@@ -194,18 +194,22 @@
               "ref": "/services/environments/lab/gateways/www.lab.leyux.org-gw"
             }
           ],
-          "devportalRefs": [],
+          "devportalRefs": [
+            {
+              "ref": "/services/environments/lab/devportals/devportal"
+            }
+          ],
           "basePath": "/v1",
           "stripWorkloadBasePath": true
         }
-      } 
+      }
     status_code: 200, 201, 202
     validate_certs: False
 
 # Demo-API demo-api component
 - name: Create/config demo-api component
   uri:
-    url: "https://{{ baseurl }}/services/environments/lab/apps/juiceshopweb_app/components/juiceshopapi_comp"
+    url: "https://{{ baseurl }}/services/environments/lab/apps/www_web/components/demo-api_comp"
     method: PUT
     headers:
       Cookie: "{{ login.set_cookie }}"
@@ -213,26 +217,36 @@
     body: >
       {
         "metadata": {
-          "createTime": "2020-10-10T08:43:30Z",
+          "createTime": "2020-10-13T14:43:00Z",
           "kind": "components",
           "links": {
-            "rel": "/api/v1/services/environments/lab/apps/juiceshopweb_app/components/juiceshopapi_comp"
+            "rel": "/api/v1/services/environments/lab/apps/www_web/components/demo-api_comp"
           },
-          "name": "juiceshopapi_comp",
-          "uid": "d34eb767-734a-412e-a39d-5eb714cba99d",
-          "updateTime": "2020-10-10T08:44:17Z"
+          "name": "demo-api_comp",
+          "uid": "99eb1417-1e18-4436-b24c-edc7dddce3ef",
+          "updateTime": "2020-10-13T14:43:00Z"
         },
         "desiredState": {
           "backend": {
             "ntlmAuthentication": "DISABLED",
             "preserveHostHeader": "DISABLED",
             "workloadGroups": {
-              "juiceshopapi_wlg": {
+              "demo_api_wlg": {
                 "loadBalancingMethod": {
                   "type": "ROUND_ROBIN"
                 },
+                "locationRefs": [
+                  {
+                    "links": {
+                      "rel": "/api/v1/infrastructure/locations/unspecified",
+                      "displayName": "Unspecified (default)",
+                      "name": "unspecified"
+                    },
+                    "ref": "/infrastructure/locations/unspecified"
+                  }
+                ],
                 "uris": {
-                  "http://api.lab.leyux.org:3000": {
+                  "http://sigw.lab.leyux.org:5000": {
                     "isBackup": false,
                     "isDown": false,
                     "isDrain": false
@@ -243,13 +257,13 @@
           },
           "ingress": {
             "uris": {
-              "/orders": {
+              "/greet": {
                 "matchMethod": "EXACT"
               }
             },
             "gatewayRefs": [
               {
-                "ref": "/services/environments/lab/gateways/juiceapi.lab.leyux.org-gw"
+                "ref": "/services/environments/lab/gateways/www.lab.leyux.org-gw"
               }
             ]
           },
@@ -261,14 +275,10 @@
           },
           "publishedApiRefs": [
             {
-              "ref": "/services/environments/lab/apps/juiceshopweb_app/published-apis/juiceshop_api"
+              "ref": "/services/environments/lab/apps/www_web/published-apis/demo-api"
             }
           ],
-          "security": {
-            "waf": {
-              "isEnabled": false
-            }
-          }
+          "security": {}
         }
       }
     status_code: 200, 201, 202
