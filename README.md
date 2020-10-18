@@ -129,3 +129,42 @@ Remove a specific upstream by id# :
 curl '127.0.0.1/upstream_conf?remove=&upstream=backend&id=0'
 ```
 
+- JWT validation
+see https://jwt.io
+
+Header:
+```
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+``` 
+
+Payload:
+```
+{
+  "fullName": "Christoph Leygraf",
+  "url": "http://www.lab.leyux.org"
+}
+```
+
+Signature:
+```
+nginx123
+```
+
+JWT:
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmdWxsTmFtZSI6IkNocmlzdG9waCBMZXlncmFmIiwidXJsIjoiaHR0cDovL3d3dy5sYWIubGV5dXgub3JnIn0.PkD5pmaCmuKNMeqq_X2Q38Q0cZoAuTEecC-VXk9nNJg
+``` 
+
+```
+curl "https:/www.lab.leyux.org/v1/greet?myjwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmdWxsTmFtZSI6IkNocmlzdG9waCBMZXlncmFmIiwidXJsIjoiaHR0cDovL3d3dy5sYWIubGV5dXgub3JnIn0.PkD5pmaCmuKNMeqq_X2Q38Q0cZoAuTEecC-VXk9nNJg" --insecure -H "Authorization: Bearer 
+```
+
+OpenID Connect Discovery:
+
+```
+https://dev-173872.okta.com/.well-known/openid-configuration
+```
+
