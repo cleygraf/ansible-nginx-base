@@ -4,8 +4,8 @@
 - hosts: lb
 
   roles:
-    - role: common
-      become: yes
+    # - role: common
+    #   become: yes
 
     - role: lb
       become: yes
