@@ -4,7 +4,7 @@
 - hosts: api
 
   roles:
-    # - role: common
-    #   become: yes
+    - role: common
+      become: yes
 
     - role: api

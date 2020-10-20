@@ -4,7 +4,7 @@
 - hosts: ctl
 
   roles:
-    # - role: common
-    #   become: yes
+    - role: common
+      become: yes
 
     - role: ctl
