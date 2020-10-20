@@ -21,9 +21,12 @@
       state: latest
       update_cache: yes
 
-  - name: install net-tools (netstat, ...)
+  - name: Install a list of packages (git, jq, net-tools)
     yum:
-      name: net-tools
+      name:
+        - git
+        - jq
+        - net-tools
       state: latest
 
   - name: Disable SELinux
