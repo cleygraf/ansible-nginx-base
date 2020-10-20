@@ -2,7 +2,7 @@
 subdomain: lab.leyux.org
 controllername: ctl
 gwhostname: n01
-gwadditionalhostnames: "petstore.lab.leyux.org juiceshop.lab.leyux.org devportal.lab.leyux.org www.lab.leyux.org"
+gwadditionalhostnames: "petapi juiceshop juiceapi devportal www"
 
 # User details for NGINX controller
 firstname: Christoph
@@ -17,14 +17,33 @@ nginxplus_cert_key_path: ~/nginx/certs/
 server_cert_key_path: ~/nginx/ssl/
 nginx_binary_path: ~/nginx/binaries/
 nginx_license_path: ~/nginx/licenses/
-certificate_path: ~/letsencrypt/live/lab.leyux.org/
+certificate_path: ~/certificates/
+
+# Octa configuration
+octadomain: "dev-173872.okta.com"
+octaclientid: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          30613638326135646263373938663136356533333463623638393933343935636262653337306633
+          6462613737623061323565343363636236336138616434380a663036633031356462633664653464
+          65663763643763316662383635356164646237386462393532313564333633616661626532383361
+          3537653262303165370a353937303465616461303631386438376339636466623235643461633138
+          32616436363432326465313161383832306630313237373566383965313834363331
+octaclientsecret: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          34336164663632326531323162333766356166646436303561383061393435333166633336316166
+          3039393035353964363637663133633138623931666636320a336364633033346236666137653636
+          35333661646135636134623536373930346464366134333063323635303166666662616138323330
+          3865313162373239380a623134626262383033616636356330633938646435343834663565323736
+          33623338646133366335363733353865643935636336626231313561396438313962663630366132
+          6530313530306437356433343936346134636261323564626462
+
 
 # Default hosts file to manipulate
 hostsfile: "/etc/hosts"
 
 # Additional hosts
-additional_hosts:
-  tls:
-    additional_hosts_ip: 192.168.1.114
+# additional_hosts:
+#   tls:
+#     additional_hosts_ip: 192.168.1.114
 #    additional_host_dns_aliases: "gw.lab.leyux.org"
 

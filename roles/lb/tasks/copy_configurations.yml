@@ -1,14 +1,54 @@
 - name: copy nginx-plus configuration file default.conf
   template: src=etc/nginx/conf.d/default.conf dest=/etc/nginx/conf.d/default.conf owner=root mode=0644
 
-- name: copy nginx-plus configuration file simple_lb.conf
-  template: src=etc/nginx/conf.d/simple_lb.conf dest=/etc/nginx/conf.d/simple_lb.conf owner=root mode=0644
+# - name: copy nginx-plus configuration file simple_lb.conf
+#   template: src=etc/nginx/conf.d/simple_lb.conf dest=/etc/nginx/conf.d/simple_lb.conf owner=root mode=0644
 
 - name: copy nginx-plus configuration file nginx.conf
   template: src=etc/nginx/nginx.conf dest=/etc/nginx/nginx.conf owner=root mode=0644
 
+- name: copy nginx-plus appprotect configuration file log-illegal.json
+  template: src=etc/nginx/log-illegal.json dest=/etc/nginx/log-illegal.json owner=root mode=0644
+
 - name: copy nginx-plus configuration file nginx-plus-api.conf
   template: src=etc/nginx/conf.d/nginx-plus-api.conf dest=/etc/nginx/conf.d/nginx-plus-api.conf owner=root mode=0644
+
+- name: copy nginx-plus configuration file frontend.conf
+  template: src=etc/nginx/conf.d/frontend.conf dest=/etc/nginx/conf.d/frontend.conf owner=root mode=0644
+
+- name: copy nginx-plus file oidc_id_tokens.json
+  template: src=etc/nginx/conf.d/oidc_id_tokens.json dest=/etc/nginx/conf.d/oidc_id_tokens.json owner=nginx group=nginx mode=0644
+
+- name: copy nginx-plus file refresh_tokens.json
+  template: src=etc/nginx/conf.d/refresh_tokens.json dest=/etc/nginx/conf.d/refresh_tokens.json owner=nginx group=nginx mode=0644
+
+- name: copy nginx-plus configuration file openid_connect_configuration.conf
+  template: src=etc/nginx/conf.d/openid_connect_configuration.conf dest=/etc/nginx/conf.d/openid_connect_configuration.conf owner=root mode=0644
+
+- name: copy nginx-plus configuration file openid_connect.js
+  template: src=etc/nginx/conf.d/openid_connect.js dest=/etc/nginx/conf.d/openid_connect.js owner=root mode=0644
+
+- name: copy nginx-plus configuration file openid_connect.server_conf
+  template: src=etc/nginx/conf.d/openid_connect.server_conf dest=/etc/nginx/conf.d/openid_connect.server_conf owner=root mode=0644
+
+- name: copy nginx-plus configuration file idp_jwk.json
+  template: src=etc/nginx/conf.d/idp_jwk.json dest=/etc/nginx/conf.d/idp_jwk.json owner=root mode=0644
+
+- name: copy nginx-plus security.log
+  template: src=var/log/nginx/security.log dest=/var/log/nginx/security.log owner=nginx group=nginx mode=0644
+
+- name: copy server.crt
+  copy: src={{ certificate_path }}/{{ subdomain }}/cert.pem dest=/etc/ssl/certs/cert.pem owner=root group=root mode=0644
+  
+- name: copy server.key
+  copy: src={{ certificate_path }}/{{ subdomain }}/fullchain.pem dest=/etc/ssl/certs/fullchain.pem owner=root group=root mode=0644
+
+- name: Change ownership of a /etc/nginx/conf.d
+  file:
+    path: /etc/nginx/conf.d
+    state: directory
+    owner: nginx
+    group: nginx
 
 - name: reload nginx
   service:
