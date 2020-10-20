@@ -14,6 +14,7 @@
     status_code: 204
     validate_certs: False
   register: login
+  tags: demo
 
 # Demo-API web app
 - name: Create/configure demo-api web app
@@ -35,6 +36,7 @@
       }
     status_code: 200, 201, 202
     validate_certs: False
+  tags: demo
 
 # Demo-API web app component
 - name: Create/configure demo-api web component
@@ -54,7 +56,7 @@
           "ingress": {
             "gatewayRefs": [
               {
-                "ref": "/services/environments/lab/gateways/www.lab.leyux.org-gw"
+                "ref": "/services/environments/lab/gateways/www.{{ subdomain }}-gw"
               }
             ],
             "uris": {
@@ -106,6 +108,7 @@
       }
     status_code: 200, 201, 202
     validate_certs: False
+  tags: demo
 
 # Demo-API demo-api
 - name: Create/configure demo-api
@@ -170,6 +173,7 @@
       }
     status_code: 200, 201, 202
     validate_certs: False
+  tags: demo
 
 # Demo-API demo-api publish
 - name: Publish demo-api
@@ -191,7 +195,7 @@
           },
           "gatewayRefs": [
             {
-              "ref": "/services/environments/lab/gateways/www.lab.leyux.org-gw"
+              "ref": "/services/environments/lab/gateways/www.{{ subdomain }}-gw"
             }
           ],
           "devportalRefs": [
@@ -205,6 +209,7 @@
       }
     status_code: 200, 201, 202
     validate_certs: False
+  tags: demo
 
 # Demo-API demo-api component
 - name: Create/config demo-api component
@@ -263,7 +268,7 @@
             },
             "gatewayRefs": [
               {
-                "ref": "/services/environments/lab/gateways/www.lab.leyux.org-gw"
+                "ref": "/services/environments/lab/gateways/www.{{ subdomain }}-gw"
               }
             ]
           },
@@ -283,4 +288,5 @@
       }
     status_code: 200, 201, 202
     validate_certs: False
+  tags: demo
 

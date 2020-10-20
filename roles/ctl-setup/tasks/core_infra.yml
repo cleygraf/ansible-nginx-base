@@ -14,6 +14,7 @@
     status_code: 204
     validate_certs: False
   register: login
+  tags: core  
 
 # Locations
 - name: Create/configure locations
@@ -38,6 +39,7 @@
     - "aws"
     - "azure"
     - "gcp"
+  tags: core
 
 # Environments
 - name: Create/configure environments
@@ -59,6 +61,7 @@
     - "dev"
     - "test"
     - "prod"
+  tags: core
 
 # - name: generate private key
 #   local_action:
@@ -67,6 +70,7 @@
 #     size: 2048
 #     type: RSA
 #   register: privatekey
+  # tags: core
 
 # Generate self signed certificate and uplod
 # - name: create and csrs
@@ -78,6 +82,7 @@
 #     common_name: "*.{{ env }}.{{ subdomain }}"
 #     country_name: "{{ country }}"
 #   register: csr
+  # tags: core
 
 # - name: generate certificate 
 #   local_action:
@@ -86,6 +91,7 @@
 #     privatekey_path: "{{ privatekey.filename }}"
 #     csr_path: "{{ server_cert_key_path }}/wildcard_{{ env }}_csr.pem"
 #     provider: selfsigned
+  # tags: core
 
 # - name: Upload certificate
 #   uri:
@@ -104,6 +110,7 @@
 #         caCerts: []
 #     status_code: 200,201
 #     validate_certs: False
+  # tags: core
 
 # - name: cleanup csrs and certs.
 #   local_action:
@@ -112,6 +119,7 @@
 #     state: absent
 #   with_fileglob:
 #     - "{{ server_cert_key_path }}/wildcard*"
+  # tags: core
 
 # Upload certificate
 - name: Upload certificate
@@ -131,22 +139,23 @@
         caCerts: []
     status_code: 200,201,500
     validate_certs: False
+  tags: core
 
 # Gateways
 - name: Create/configure gateways
   uri:
-    url: "https://{{ baseurl }}/services/environments/{{ env }}/gateways/{{ item }}-gw"
+    url: "https://{{ baseurl }}/services/environments/{{ env }}/gateways/{{ item }}.{{ subdomain }}-gw"
     method: PUT
     headers:
       Cookie: "{{ login.set_cookie }}"
     body_format: json
     body: >
-      { "metadata": { "name": "{{ item }}-gw" },
+      { "metadata": { "name": "{{ item }}.{{ subdomain }}-gw" },
         "desiredState": {
           "ingress": {
             "uris": {
-              "http://{{ item }}": {},
-              "https://{{ item }}": {
+              "http://{{ item }}.{{ subdomain }}": {},
+              "https://{{ item }}.{{ subdomain }}": {
                 "tls": {
                   "certRef": {
                     "ref": "/services/environments/{{ env }}/certs/{{ env}}_wildcard"
@@ -173,12 +182,8 @@
       }
     status_code: 200,201,202
     validate_certs: False
-  loop:
-    - "www.lab.leyux.org"
-    - "devportal.lab.leyux.org"
-    - "juiceshop.lab.leyux.org"
-    - "juiceapi.lab.leyux.org"
-    - "petapi.lab.leyux.org"
+  with_items: "{{ gwadditionalhostnames.split() }}"
+  tags: core
 
 # Developer portal
 - name: Create developer portal 
@@ -200,7 +205,7 @@
           "ingress": {
             "gatewayRefs": [
               {
-                "ref": "/services/environments/lab/gateways/devportal.lab.leyux.org-gw"
+                "ref": "/services/environments/lab/gateways/devportal.{{ subdomain }}-gw"
               }
             ]
           },
@@ -256,3 +261,4 @@
       }
     status_code: 200, 201, 202
     validate_certs: False
+  tags: core

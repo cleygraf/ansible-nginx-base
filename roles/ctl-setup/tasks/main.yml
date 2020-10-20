@@ -2,7 +2,11 @@
 # file: roles/ctl-setup/tasks/main.yml
 
 - include_tasks: user_roles.yml
+  tags: user
 - include_tasks: core_infra.yml
+  tags: core
 - include_tasks: juiceshop.yml
+  tags: juice
 - include_tasks: demo_api.yml
+  tags: demo
 

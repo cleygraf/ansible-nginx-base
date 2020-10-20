@@ -14,6 +14,7 @@
     status_code: 204
     validate_certs: False
   register: login
+  tags: juice
 
 # Juiceshop web app
 - name: Create/configure juiceshop web app
@@ -35,6 +36,7 @@
       }
     status_code: 200, 201, 202
     validate_certs: False
+  tags: juice
 
 - name: Create/configure juiceshop web app component
   uri:
@@ -53,7 +55,7 @@
           "ingress": {
             "gatewayRefs": [
               {
-                "ref": "/services/environments/lab/gateways/juiceshop.lab.leyux.org-gw"
+                "ref": "/services/environments/lab/gateways/juiceshop.{{ subdomain }}-gw"
               }
             ],
             "uris": {
@@ -81,7 +83,7 @@
                   "type": "ROUND_ROBIN"
                 },
                 "uris": {
-                  "http://api.lab.leyux.org:3000": {
+                  "http://api.{{ subdomain }}:3000": {
                     "isBackup": false,
                     "isDown": false,
                     "isDrain": false
@@ -109,6 +111,7 @@
       }
     status_code: 200, 201, 202
     validate_certs: False
+  tags: juice
 
 # Juiceshop api
 - name: Create/configure juiceshop api
@@ -243,6 +246,7 @@
       }
     status_code: 200, 201, 202
     validate_certs: False
+  tags: juice
 
 # Juiceshop api publish
 - name: Publish juiceshop api 
@@ -264,7 +268,7 @@
           },
           "gatewayRefs": [
             {
-              "ref": "/services/environments/lab/gateways/juiceapi.lab.leyux.org-gw"
+              "ref": "/services/environments/lab/gateways/juiceapi.{{ subdomain }}-gw"
             }
           ],
           "devportalRefs": [
@@ -278,6 +282,7 @@
       }
     status_code: 200, 201, 202
     validate_certs: False
+  tags: juice
 
 # Juiceshop api component
 - name: Create/configure juiceshop api component
@@ -309,7 +314,7 @@
                   "type": "ROUND_ROBIN"
                 },
                 "uris": {
-                  "http://api.lab.leyux.org:3000": {
+                  "http://api.{{ subdomain }}:3000": {
                     "isBackup": false,
                     "isDown": false,
                     "isDrain": false
@@ -326,7 +331,7 @@
             },
             "gatewayRefs": [
               {
-                "ref": "/services/environments/lab/gateways/juiceapi.lab.leyux.org-gw"
+                "ref": "/services/environments/lab/gateways/juiceapi.{{ subdomain }}-gw"
               }
             ]
           },
@@ -350,3 +355,4 @@
       }
     status_code: 200, 201, 202
     validate_certs: False
+  tags: juice

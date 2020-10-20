@@ -14,6 +14,7 @@
     status_code: 204
     validate_certs: False
   register: login
+  tags: user
 
 - name: Check a couple of users    
   uri:
@@ -35,6 +36,7 @@
     label: "{{ item.firstname | lower }}@{{ subdomain }}"
   ignore_errors: yes
   register: check_users
+  tags: user
 
 - name: Create a couple of users    
   uri:
@@ -65,4 +67,5 @@
   loop: "{{ check_users.results }}"
   loop_control:
     label: "{{ item.item.firstname | lower }}@{{ subdomain }}"
+  tags: user
 
