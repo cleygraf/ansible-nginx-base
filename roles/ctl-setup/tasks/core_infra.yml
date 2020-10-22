@@ -134,8 +134,8 @@
         name: "{{ env }}_wildcard"
       desiredState:
         type: PEM
-        privateKey: "{{ lookup( 'file', '{{ certificate_path }}privkey.pem') }}"
-        publicCert: "{{ lookup( 'file', '{{ certificate_path }}cert.pem' ) }}"
+        privateKey: "{{ lookup( 'file', '{{ certificate_path }}/{{ subdomain }}/privkey.pem') }}"
+        publicCert: "{{ lookup( 'file', '{{ certificate_path }}/{{ subdomain }}/cert.pem' ) }}"
         caCerts: []
     status_code: 200,201,500
     validate_certs: False
@@ -257,6 +257,96 @@
           },
           "publishedApiRefs": [],
           "devPortalType": "private"
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  tags: core
+
+# IDP: API-Key
+- name: Create/configure idp api-key 
+  uri:
+    url: "https://{{ baseurl }}/security/identity-providers/api_key"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "api_key",
+          "tags": []
+        },
+        "desiredState": {
+          "environmentRefs": [
+            {
+              "ref": "/services/environments/lab"
+            }
+          ],
+          "identityProvider": {
+            "type": "API_KEY"
+          }
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  tags: core
+
+- name: Create/configure api-key client 
+  uri:
+    url: "https://{{ baseurl }}/security/identity-providers/api_key/clients"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "items": [
+          {
+            "metadata": {
+              "name": "customer_a"
+            },
+            "desiredState": {
+              "credential": {
+                "apiKey": "a3087c72906aa2e16248d02eae710193",
+                "type": "API_KEY"
+              }
+            }
+          }
+        ]
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  tags: core  
+
+# IDP: JWT validation
+- name: Create/configure idp jwt validation
+  uri:
+    url: "https://{{ baseurl }}/security/identity-providers/jwt"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "jwt",
+          "tags": []
+        },
+        "desiredState": {
+          "environmentRefs": [
+            {
+              "ref": "/services/environments/lab"
+            }
+          ],
+          "identityProvider": {
+            "type": "JWT",
+            "jwkFile": {
+              "type": "REMOTE_FILE",
+              "uri": "https://{{ octadomain }}/oauth2/v1/keys",
+              "cacheExpire": "24h"
+            }
+          }
         }
       }
     status_code: 200, 201, 202
