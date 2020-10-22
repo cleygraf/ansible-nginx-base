@@ -1,0 +1,412 @@
+---
+# file: roles/ctl-setup/tasks/petstore.yml
+
+- name: Login to the controller
+  uri:
+    url: "https://{{ baseurl }}/platform/login"
+    method: POST
+    body_format: json
+    body:
+      credentials:
+        type: "BASIC"
+        username: "{{ email }}"
+        password: "{{ password }}"
+    status_code: 204
+    validate_certs: False
+  register: login
+  tags: petstore
+
+# Petstore app
+- name: Create/configure petstore app
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps/petstore_app"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "petstore_app",
+          "displayName": "",
+          "description": "",
+          "tags": []
+        },
+        "desiredState": {}
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  tags: petstore
+
+- name: Create/configure petstore web app component
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps/petstore_app/components/petstore_app_comp"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "petstore_app_comp",
+          "tags": []
+        },
+        "desiredState": {
+          "ingress": {
+            "gatewayRefs": [
+              {
+                "ref": "/services/environments/lab/gateways/petapi.{{ subdomain }}-gw"
+              }
+            ],
+            "uris": {
+              "/": {}
+            }
+          },
+          "backend": {
+            "ntlmAuthentication": "DISABLED",
+            "preserveHostHeader": "DISABLED",
+            "workloadGroups": {
+              "petstore_app_comp_wlg": {
+                "locationRefs": [
+                  {
+                    "ref": "/infrastructure/locations/unspecified"
+                  }
+                ],
+                "loadBalancingMethod": {
+                  "type": "ROUND_ROBIN"
+                },
+                "uris": {
+                  "http://api.{{ subdomain }}:3001": {
+                    "isBackup": false,
+                    "isDown": false,
+                    "isDrain": false
+                  }
+                }
+              }
+            }
+          },
+          "logging": {
+            "errorLog": "DISABLED",
+            "accessLog": {
+              "state": "DISABLED"
+            }
+          },
+          "security": {
+            "waf": {
+              "isEnabled": true,
+              "isMonitorOnly": false,
+              "signatureOverrides": {}
+            },
+            "strategyRef": {
+              "ref": "/services/strategies/balanced_default"
+            }
+          }
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  tags: petstore
+
+# petstore api
+- name: Create/configure petstore api
+  uri:
+    url: "https://{{ baseurl }}/services/api-definitions/petstore_api/versions/1.0.0"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "1.0.0",
+          "displayName": "Swagger Petstore"
+        },
+        "desiredState": {
+          "specs": {
+            "REST": {
+              "openapi": "3.0.0",
+              "info": {
+                "version": "1.0.0",
+                "title": "Swagger Petstore",
+                "license": {
+                  "name": "MIT"
+                }
+              },
+              "paths": {
+                "/pets": {
+                  "x-controller-match-method": "EXACT",
+                  "get": {
+                    "summary": "List all pets",
+                    "parameters": [
+                      {
+                        "name": "limit",
+                        "description": "How many items to return at one time (max 100)",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "integer"
+                        }
+                      }
+                    ],
+                    "responses": {
+                      "200": {
+                        "description": "A paged array of pets",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "name"
+                                ],
+                                "properties": {
+                                  "id": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "tag": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "description": "unexpected error",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "type": "object",
+                              "required": [
+                                "code",
+                                "message"
+                              ],
+                              "properties": {
+                                "code": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "message": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "post": {
+                    "summary": "Create a pet",
+                    "responses": {
+                      "201": {
+                        "description": "Null response",
+                        "content": {
+                          "application/json": {}
+                        }
+                      },
+                      "default": {
+                        "description": "unexpected error",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "type": "object",
+                              "required": [
+                                "code",
+                                "message"
+                              ],
+                              "properties": {
+                                "code": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "message": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "/pets/{petId}": {
+                  "x-controller-match-method": "EXACT",
+                  "get": {
+                    "summary": "Info for a specific pet",
+                    "parameters": [
+                      {
+                        "name": "petId",
+                        "description": "The id of the pet to retrieve",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "responses": {
+                      "200": {
+                        "description": "Expected response to a valid request",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "type": "object",
+                              "required": [
+                                "id",
+                                "name"
+                              ],
+                              "properties": {
+                                "id": {
+                                  "type": "integer",
+                                  "format": "int64"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "tag": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "description": "unexpected error",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "type": "object",
+                              "required": [
+                                "code",
+                                "message"
+                              ],
+                              "properties": {
+                                "code": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "message": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  tags: petstore
+
+# petstore api publish
+- name: Publish petstore api 
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps/petstore_app/published-apis/petstore_api"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "petstore_api",
+          "tags": []
+        },
+        "desiredState": {
+          "apiDefinitionVersionRef": {
+            "ref": "/services/api-definitions/petstore_api/versions/1.0.0"
+          },
+          "gatewayRefs": [
+            {
+              "ref": "/services/environments/lab/gateways/petapi.{{ subdomain }}-gw"
+            }
+          ],
+          "devportalRefs": [
+            {
+              "ref": "/services/environments/lab/devportals/devportal"
+            }
+          ],
+          "basePath": "/v2",
+          "stripWorkloadBasePath": false
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  tags: petstore
+
+# petstore api component
+- name: Create/configure petstore api component
+  uri:
+    url: "https://{{ baseurl }}/services/environments/lab/apps/petstore_app/components/petstore_api_comp"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "petstore_api_comp",
+          "tags": []
+        },
+        "desiredState": {
+          "ingress": {
+            "uris": {}
+          },
+          "backend": {
+            "ntlmAuthentication": "DISABLED",
+            "preserveHostHeader": "DISABLED",
+            "workloadGroups": {
+              "petstore_api_comp_wlg": {
+                "locationRefs": [
+                  {
+                    "ref": "/infrastructure/locations/unspecified"
+                  }
+                ],
+                "loadBalancingMethod": {
+                  "type": "ROUND_ROBIN"
+                },
+                "uris": {
+                  "http://api.{{ subdomain }}:3001": {
+                    "isBackup": false,
+                    "isDown": false,
+                    "isDrain": false
+                  }
+                }
+              }
+            }
+          },
+          "logging": {
+            "errorLog": "DISABLED",
+            "accessLog": {
+              "state": "DISABLED"
+            }
+          },
+          "security": {
+            "waf": {
+              "isEnabled": false,
+              "isMonitorOnly": false,
+              "signatureOverrides": {}
+            }
+          }
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  tags: petstore
