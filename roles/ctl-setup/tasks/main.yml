@@ -9,4 +9,5 @@
   tags: juice
 - include_tasks: demo_api.yml
   tags: demo
-
+- include_tasks: petstore.yml
+  tags: petstore
