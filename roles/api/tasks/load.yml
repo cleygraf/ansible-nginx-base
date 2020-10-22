@@ -1,0 +1,40 @@
+---
+#file: roles/api/tasks/load.yml
+
+- name: Pull an blazemeter/taurus image
+  docker_image:
+    name: blazemeter/taurus
+    source: pull
+  become: true
+
+- name: Create /root/bzt-configs directory if it does not exist
+  file:
+    path: /root/bzt-configs
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Create /root/artifacts directory if it does not exist
+  file:
+    path: /root/artifacts
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Copy configuration file load1.yml
+  template: src=load1.yml dest=/root/bzt-configs/load1.yml owner=root mode=0644
+  become: true
+
+- name: Start a blazemeter/taurus container
+  docker_container:
+    name: load
+    image: blazemeter/taurus
+    state: started
+    network_mode: host
+    command: load1.yml
+    volumes:
+      - /root/bzt-configs:/bzt-configs
+#      - /root/artifacts:/tmp/artifacts
+  become: true
+
+

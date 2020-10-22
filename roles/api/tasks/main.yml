@@ -4,3 +4,4 @@
 - include_tasks: prerequisites.yml
 - include_tasks: juice.yml
 - include_tasks: pets.yml
+- include_tasks: load.yml
