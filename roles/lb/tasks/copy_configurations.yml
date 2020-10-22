@@ -37,11 +37,14 @@
 - name: copy nginx-plus security.log
   template: src=var/log/nginx/security.log dest=/var/log/nginx/security.log owner=nginx group=nginx mode=0644
 
-- name: copy server.crt
+- name: copy cert.pem
   copy: src={{ certificate_path }}/{{ subdomain }}/cert.pem dest=/etc/ssl/certs/cert.pem owner=root group=root mode=0644
   
-- name: copy server.key
+- name: copy fullchain.pem
   copy: src={{ certificate_path }}/{{ subdomain }}/fullchain.pem dest=/etc/ssl/certs/fullchain.pem owner=root group=root mode=0644
+
+- name: copy privkey.pem
+  copy: src={{ certificate_path }}/{{ subdomain }}/privkey.pem dest=/etc/ssl/certs/privkey.pem owner=root group=root mode=0644
 
 - name: Change ownership of a /etc/nginx/conf.d
   file:
