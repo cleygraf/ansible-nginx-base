@@ -1,0 +1,25 @@
+execution:
+- concurrency: 100
+  ramp-up: 1m
+  hold-for: 120m
+  scenario: quick-test
+
+scenarios:
+  quick-test:
+    requests:
+    - https://www.{{ subdomain }}
+    - https://www.{{ subdomain }}/#/login
+    - https://www.{{ subdomain }}/#/contact
+    - https://www.{{ subdomain }}/#/about
+    - https://www.{{ subdomain }}/?v=%3Cscript%3E
+    - https://petapi.{{ subdomain }}
+    - https://petapi.{{ subdomain }}/#/login
+    - https://petapi.{{ subdomain }}/#/contact
+    - https://petapi.{{ subdomain }}/#/about
+    - https://petapi.{{ subdomain }}/?v=%3Cscript%3E
+    - https://juiceshop.{{ subdomain }}
+    - https://juiceshop.{{ subdomain }}/#/login
+    - https://juiceshop.{{ subdomain }}/#/contact
+    - https://juiceshop.{{ subdomain }}/#/about
+    - https://juiceshop.{{ subdomain }}/?v=%3Cscript%3E
+
