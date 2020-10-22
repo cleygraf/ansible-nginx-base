@@ -168,3 +168,9 @@ OpenID Connect Discovery:
 https://dev-173872.okta.com/.well-known/openid-configuration
 ```
 
+JWKS:
+
+```
+https://dev-173872.okta.com/oauth2/v1/keys
+```
+
