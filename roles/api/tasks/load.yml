@@ -25,6 +25,13 @@
   template: src=load1.yml dest=/root/bzt-configs/load1.yml owner=root mode=0644
   become: true
 
+- name: Stop blazemeter/taurus container 
+  docker_container:
+    name: load
+    image: blazemeter/taurus
+    state: stopped
+  become: true
+
 - name: Start a blazemeter/taurus container
   docker_container:
     name: load
