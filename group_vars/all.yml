@@ -1,3 +1,6 @@
+---
+# file: group_vars/all.yml
+
 # Infrastructure
 subdomain: lab.leyux.org
 controllername: ctl
