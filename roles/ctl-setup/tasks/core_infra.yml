@@ -188,8 +188,8 @@
 # Developer portal
 - name: Create developer portal 
   uri:
-    url: "https://{{ baseurl }}/services/environments/lab/devportals/devportal"
-    method: PUT
+    url: "https://{{ baseurl }}/services/environments/lab/devportals"
+    method: POST
     headers:
       Cookie: "{{ login.set_cookie }}"
     body_format: json
