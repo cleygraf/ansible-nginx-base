@@ -27,6 +27,7 @@
         - git
         - jq
         - net-tools
+        - htop
       state: latest
 
   - name: Disable SELinux
