@@ -20,14 +20,14 @@
     name: ca-certificates
     state: latest
 
-- name: install NGINX Plus (nginx-plus-22-1.el7.ngx)
+- name: install NGINX Plus 
   yum:
-    name: nginx-plus-22-1.el7.ngx
+    name: nginx-plus
     state: installed
 
 - name: install NGINX App Protect
   yum:
-    name: app-protect-22+2.52.5-1.el7.ngx
+    name: app-protect
     state: latest
 
  - name: install NGINX App Protect Threat Campaigns
@@ -37,7 +37,7 @@
 
 - name: install NGINX njs module
   yum:
-    name: nginx-plus-module-njs-22+0.4.4-2.el7.ngx
+    name: nginx-plus-module-njs
     state: latest
 
 - name: Start NGINX Plus service
