@@ -13,7 +13,12 @@ c3version: "3.6.0"
 # offlinebuild: "2419105" # 3.10RC3
 # offlinebuild: "2621252" # 3.12RC1
 # offlinebuild: "2635733" # 3.12RC2
-offlinebuild: "2641916" # 3.12RC3
+# offlinebuild: "2641916" # 3.12RC3
+# offlinebuild: "2646126" # 3.12RC4
+# offlinebuild: "2750233" # 3.13RC1
+# offlinebuild: "2774286" # 3.13RC2
+# offlinebuild: "2792189" # 3.13RC4
+offlinebuild: "2831505" # 3.14RC0
 controllerfile: "offline-controller-installer-{{ offlinebuild }}.tar.gz"
 
 location: "unspecified"
