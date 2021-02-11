@@ -42,11 +42,18 @@
     cmd: "API_KEY='{{ apiKey }}' sh /tmp/install.sh -y --insecure"
     creates: /lib/systemd/system/controller-agent.service
 
-- name: Enable beta features
+# - name: Enable beta features
+#   blockinfile:
+#     path: /etc/controller-agent/agent.conf
+#     insertafter: '^\[extensions\]'
+#     block: "beta = True"
+#   become: yes
+
+- name: Enable security events
   blockinfile:
     path: /etc/controller-agent/agent.conf
     insertafter: '^\[extensions\]'
-    block: "beta = True"
+    block: "security = True"
   become: yes
 
 - name: Restart controller-agent

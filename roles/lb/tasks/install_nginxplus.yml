@@ -1,4 +1,5 @@
-# ./tasks/install_nginx_plus.yml
+---
+# tasks/install_nginx_plus.yml
 
 - name: create NGINX Plus ssl cert repo directory
   file: path=/etc/ssl/nginx state=directory group=root mode=0700
@@ -20,24 +21,24 @@
     name: ca-certificates
     state: latest
 
-- name: install NGINX Plus (nginx-plus-22-1.el7.ngx)
+- name: install NGINX Plus
   yum:
-    name: nginx-plus-22-1.el7.ngx
-    state: installed
+    name: nginx-plus
+    state: latest
 
 - name: install NGINX App Protect
   yum:
-    name: app-protect-22+2.52.5-1.el7.ngx
+    name: app-protect
     state: latest
 
- - name: install NGINX App Protect Threat Campaigns
-   yum:
-     name: app-protect-threat-campaigns
-     state: latest
+- name: install NGINX App Protect Threat Campaigns
+  yum:
+    name: app-protect-threat-campaigns
+    state: latest
 
 - name: install NGINX njs module
   yum:
-    name: nginx-plus-module-njs-22+0.4.4-2.el7.ngx
+    name: nginx-plus-module-njs
     state: latest
 
 - name: Start NGINX Plus service
