@@ -40,10 +40,10 @@
 #   become: yes
 
 - name: copy server.crt
-  copy: src={{ certificate_path }}/{{ subdomain }}/fullchain.pem dest=/tmp/server.crt 
+  copy: src={{ certificate_path }}/{{ subdomain }}/fullchain1.pem dest=/tmp/server.crt 
   
 - name: copy server.key
-  copy: src={{ certificate_path }}/{{ subdomain }}/privkey.pem dest=/tmp/server.key
+  copy: src={{ certificate_path }}/{{ subdomain }}/privkey1.pem dest=/tmp/server.key
 
 # Copy and unpack required files 
 - name: "unpack {{ controllerfile }} to /tmp"
