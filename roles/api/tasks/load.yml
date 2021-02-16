@@ -41,7 +41,6 @@
     command: load1.yml
     volumes:
       - /root/bzt-configs:/bzt-configs
-#      - /root/artifacts:/tmp/artifacts
   become: true
 
 
