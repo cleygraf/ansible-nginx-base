@@ -1,6 +1,2 @@
 ---
 # file: roles/ctl-register/vars/main.yml
-
-fqdn: "{{ controllername }}.{{ subdomain }}"
-baseurl: "{{ fqdn }}/api/v1"
-

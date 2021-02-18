@@ -40,10 +40,10 @@
 #   become: yes
 
 - name: copy server.crt
-  copy: src={{ certificate_path }}/{{ subdomain }}/fullchain1.pem dest=/tmp/server.crt 
+  copy: src={{ certificate_path }}/{{ subdomain }}-0001/fullchain1.pem dest=/tmp/server.crt 
   
 - name: copy server.key
-  copy: src={{ certificate_path }}/{{ subdomain }}/privkey1.pem dest=/tmp/server.key
+  copy: src={{ certificate_path }}/{{ subdomain }}-0001/privkey1.pem dest=/tmp/server.key
 
 # Copy and unpack required files 
 - name: "unpack {{ controllerfile }} to /tmp"
@@ -108,3 +108,24 @@
 
 - name: Enable CAS
   shell: /opt/nginx-controller/helper.sh setfeature AppSec true
+
+# Locations
+- name: Create/configure locations
+  uri:
+    url: "https://{{ baseurl }}/infrastructure/locations/{{ item }}"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body:
+      metadata:
+        name: "{{ item }}"
+        displayName: "{{ item }}"
+        description: "Multipass environment"
+      desiredState:
+        type: "OTHER_LOCATION"
+    status_code: 200,201,202
+    validate_certs: False
+  loop:
+    - "vmware"
+    - "container"

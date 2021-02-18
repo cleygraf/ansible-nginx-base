@@ -2,6 +2,12 @@
 # file: roles/api/tasks/main.yml
 
 - include_tasks: prerequisites.yml
+  tags: core
+- include_tasks: saft.yml
+  tags: [ 'never', 'saft' ]
 - include_tasks: juice.yml
+  tags: juice
 - include_tasks: pets.yml
+  tags: [ 'never', 'pets' ]
 - include_tasks: load.yml
+  tags: load

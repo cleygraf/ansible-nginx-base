@@ -7,7 +7,9 @@
   tags: core
 - include_tasks: juiceshop.yml
   tags: juice
+- include_tasks: saftladen.yml
+  tags: [ 'never', 'saft' ]
 - include_tasks: demo_api.yml
-  tags: demo
+  tags: [ 'never', 'demo' ]
 - include_tasks: petstore.yml
-  tags: petstore
+  tags: [ 'never', 'petstore' ]

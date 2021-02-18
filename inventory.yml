@@ -23,6 +23,12 @@ api:
       new_hostname: api.lab.leyux.org
       ansible_ssh_host: 192.168.111.149
 
+test:
+  hosts:
+    x1extreme:
+      new_hostname: x1extreme.wn.leyux.org
+      ansible_ssh_host: 192.168.1.4
+
 # tls:
 #   hosts:
 #     tls01:

@@ -1,0 +1,7 @@
+#file test.yml
+
+- hosts: test
+
+  roles:
+    - role: test
+      tags: [ 'never', 'nginx' ]

@@ -16,31 +16,6 @@
   register: login
   tags: core  
 
-# Locations
-- name: Create/configure locations
-  uri:
-    url: "https://{{ baseurl }}/infrastructure/locations/{{ item }}"
-    method: PUT
-    headers:
-      Cookie: "{{ login.set_cookie }}"
-    body_format: json
-    body:
-      metadata:
-        name: "{{ item }}"
-        displayName: "{{ item }}"
-        description: "Multipass environment"
-      desiredState:
-        type: "OTHER_LOCATION"
-    status_code: 200,201,202
-    validate_certs: False
-  loop:
-    - "emea"
-    - "us"
-    - "aws"
-    - "azure"
-    - "gcp"
-  tags: core
-
 # Environments
 - name: Create/configure environments
   uri:
@@ -52,113 +27,60 @@
     body:
       metadata:
         name: "{{ item }}"
-        displayName: "{{ item }} environment"
-        description: "{{ item }} environment on {{ item }} infrastructure"
+        description: "{{ item }} environment on {{ basedomain }} infrastructure"
     status_code: 200,201,202
     validate_certs: False
   loop:
     - "lab"
     - "dev"
     - "test"
-    - "prod"
   tags: core
-
-# - name: generate private key
-#   local_action:
-#     module: openssl_privatekey
-#     path: "{{ server_cert_key_path }}/privatekey.pem"
-#     size: 2048
-#     type: RSA
-#   register: privatekey
-  # tags: core
-
-# Generate self signed certificate and uplod
-# - name: create and csrs
-#   local_action:
-#     module: openssl_csr
-#     path: "{{ server_cert_key_path }}/wildcard_{{ env }}_csr.pem"
-#     privatekey_path: "{{ privatekey.filename }}"
-#     organization_name: "{{ organization }}"
-#     common_name: "*.{{ env }}.{{ subdomain }}"
-#     country_name: "{{ country }}"
-#   register: csr
-  # tags: core
-
-# - name: generate certificate 
-#   local_action:
-#     module: openssl_certificate
-#     path: "{{ server_cert_key_path }}/wildcard_{{ env }}_cert.pem"
-#     privatekey_path: "{{ privatekey.filename }}"
-#     csr_path: "{{ server_cert_key_path }}/wildcard_{{ env }}_csr.pem"
-#     provider: selfsigned
-  # tags: core
-
-# - name: Upload certificate
-#   uri:
-#     url: "https://{{ baseurl }}/services/environments/{{ env }}/certs/{{ env }}_wildcard"
-#     method: PUT
-#     headers:
-#       Cookie: "{{ login.set_cookie }}"
-#     body_format: json
-#     body:
-#       metadata:
-#         name: "{{ env }}_wildcard"
-#       desiredState:
-#         type: PEM
-#         privateKey: "{{ lookup( 'file', '{{ privatekey.filename }}') }}"
-#         publicCert: "{{ lookup( 'file', '{{ server_cert_key_path }}/wildcard_{{ env }}_cert.pem' ) }}"
-#         caCerts: []
-#     status_code: 200,201
-#     validate_certs: False
-  # tags: core
-
-# - name: cleanup csrs and certs.
-#   local_action:
-#     module: file
-#     path: "{{ item }}"
-#     state: absent
-#   with_fileglob:
-#     - "{{ server_cert_key_path }}/wildcard*"
-  # tags: core
 
 # Upload certificate
 - name: Upload certificate
   uri:
-    url: "https://{{ baseurl }}/services/environments/{{ env }}/certs/{{ env }}_wildcard"
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/certs/{{ item }}_wildcard"
     method: PUT
     headers:
       Cookie: "{{ login.set_cookie }}"
     body_format: json
     body:
       metadata:
-        name: "{{ env }}_wildcard"
+        name: "{{ item }}_wildcard"
       desiredState:
         type: PEM
-        privateKey: "{{ lookup( 'file', '{{ certificate_path }}/{{ subdomain }}/privkey.pem') }}"
-        publicCert: "{{ lookup( 'file', '{{ certificate_path }}/{{ subdomain }}/cert.pem' ) }}"
+        privateKey: "{{ lookup( 'file', '{{ certificate_path }}{{ item }}.{{ basedomain }}/privkey1.pem') }}"
+        publicCert: "{{ lookup( 'file', '{{ certificate_path }}{{ item }}.{{ basedomain }}/cert1.pem' ) }}"
         caCerts: []
     status_code: 200,201,500
     validate_certs: False
+  loop:
+    - "lab"
+    - "dev"
+    - "test"
   tags: core
 
 # Gateways
 - name: Create/configure gateways
   uri:
-    url: "https://{{ baseurl }}/services/environments/{{ env }}/gateways/{{ item }}.{{ subdomain }}-gw"
+    url: "https://{{ baseurl }}/services/environments/{{ item[1] }}/gateways/{{ item[0] }}.{{ item[1] }}.{{ basedomain }}-gw"
     method: PUT
     headers:
       Cookie: "{{ login.set_cookie }}"
     body_format: json
     body: >
-      { "metadata": { "name": "{{ item }}.{{ subdomain }}-gw" },
+      { "metadata": { 
+          "name": "{{ item[0] }}.{{ item[1] }}.{{ basedomain }}-gw",
+          "displayName": "{{ item[0] }}.{{ item[1] }}"        
+        },
         "desiredState": {
           "ingress": {
             "uris": {
-              "http://{{ item }}.{{ subdomain }}": {},
-              "https://{{ item }}.{{ subdomain }}": {
+              "http://{{ item[0] }}.{{ item[1] }}.{{ basedomain }}": {},
+              "https://{{ item[0] }}.{{ item[1] }}.{{ basedomain }}": {
                 "tls": {
                   "certRef": {
-                    "ref": "/services/environments/{{ env }}/certs/{{ env}}_wildcard"
+                    "ref": "/services/environments/{{ item[1] }}/certs/{{ item[1] }}_wildcard"
                   },
                   "protocols": [
                     "TLSv1.2",
@@ -169,11 +91,11 @@
               }
             },
             "placement": {
-              "instanceRefs": [ { "ref": "/infrastructure/locations/{{ location }}/instances/{{ proxy }}" } ] 
+              "instanceRefs": [ { "ref": "/infrastructure/locations/{{ location }}/instances/{{ envproxy[item[1]] }}" } ] 
             },
             "tls": {
               "certRef": {
-                "ref": "/services/environments/{{ env }}/certs/{{ env }}_wildcard"
+                "ref": "/services/environments/{{ item[1] }}/certs/{{ item[1] }}_wildcard"
               },
               "preferServerCipher": "DISABLED"
             } 
@@ -182,22 +104,24 @@
       }
     status_code: 200,201,202
     validate_certs: False
-  with_items: "{{ gwadditionalhostnames.split() }}"
+  with_nested: 
+    - [ 'devportal' ]
+    - [ 'lab', 'dev']
   tags: core
 
 # Developer portal
 - name: Create developer portal 
   uri:
-    url: "https://{{ baseurl }}/services/environments/lab/devportals"
-    method: POST
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/devportals/devportal-{{ item }}"
+    method: PUT
     headers:
       Cookie: "{{ login.set_cookie }}"
     body_format: json
     body: >
       {
         "metadata": {
-          "name": "devportal",
-          "displayName": "DevPortal-LAB",
+          "name": "devportal-{{ item }}",
+          "displayName": "DevPortal-{{ item }}",
           "tags": [],
           "kind": "devportal"
         },
@@ -205,7 +129,7 @@
           "ingress": {
             "gatewayRefs": [
               {
-                "ref": "/services/environments/lab/gateways/devportal.{{ subdomain }}-gw"
+                "ref": "/services/environments/{{ item }}/gateways/devportal.{{ item }}.{{ basedomain }}-gw"
               }
             ]
           },
@@ -253,7 +177,7 @@
                 }
               }
             },
-            "brandName": "NGINX+ DevPortal Demo"
+            "brandName": "SAFTLADEN DevPortal {{ item }}"
           },
           "publishedApiRefs": [],
           "devPortalType": "private"
@@ -261,6 +185,9 @@
       }
     status_code: 200, 201, 202
     validate_certs: False
+  loop:
+    - "lab"
+    - "dev"
   tags: core
 
 # IDP: API-Key

@@ -2,14 +2,19 @@
 # file: group_vars/all.yml
 
 # Infrastructure
-subdomain: lab.leyux.org
+basedomain: 'leyux.org'
+# Domain used as "production" environment
+subdomain: 'lab.{{ basedomain }}'
 controllername: ctl
+fqdn: "{{ controllername }}.{{ subdomain }}"
+baseurl: "{{ controllername }}.{{ subdomain }}/api/v1"
 gwhostname: n01
-gwadditionalhostnames: "petapi juiceshop juiceapi devportal www"
+#gwadditionalhostnames: "petapi juiceshop juiceapi devportal www"
+gwadditionalhostnames: "juiceshop juiceapi devportal"
 
 # User details for NGINX controller
-firstname: Christoph
-lastname: Leygraf
+firstname: Controller
+lastname: Man
 email: c.leygraf@f5.com
 password: "F5Ng1nx!"
 organization: "NGINX BU at F5"

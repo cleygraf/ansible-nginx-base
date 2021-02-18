@@ -1,19 +1,64 @@
 ---
 #file: roles/api/tasks/juice.yml
 
+- name: Copy configuration file juice.yml
+  template: src=juice.yml dest=/tmp/juiceshop.yml owner=root mode=0644
+  tags: juice
+  become: true
+
 - name: Pull an juiceshop image
   docker_image:
     name: bkimminich/juice-shop
     source: pull
+  tags: juice
   become: true
 
-- name: Start a fruitshop container
+- name: Stop "JUICESHOP" container 
+  docker_container:
+    name: juiceshop
+    image: bkimminich/juice-shop
+    state: stopped
+  tags: juice
+  become: true
+
+- name: Start a fruitshop container "JUICESHOP"
   docker_container:
     name: juiceshop
     image: bkimminich/juice-shop
     state: started
+    env:
+      NODE_ENV: "juiceshop"
+    volumes:
+      - /tmp/juiceshop.yml:/juice-shop/config/juiceshop.yml
     ports:
      - "3000:3000"
+  tags: juice
   become: true
 
+- name: Copy configuration file juice-dev.yml
+  template: src=juice-dev.yml dest=/tmp/juiceshop-dev.yml owner=root mode=0644
+  tags: juice
+  become: true
+
+- name: Stop "JUICESHOP - DEV" container 
+  docker_container:
+    name: juiceshop-dev
+    image: bkimminich/juice-shop
+    state: stopped
+  tags: juice
+  become: true
+
+- name: Start a fruitshop container "JUICESHOP - DEV"
+  docker_container:
+    name: juiceshop-dev
+    image: bkimminich/juice-shop
+    state: started
+    env:
+      NODE_ENV: "juiceshop-dev"
+    volumes:
+      - /tmp/juiceshop-dev.yml:/juice-shop/config/juiceshop-dev.yml
+    ports:
+     - "3001:3000"
+  tags: juice
+  become: true
 

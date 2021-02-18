@@ -1,25 +1,40 @@
 execution:
 - concurrency: 100
   ramp-up: 1m
-  hold-for: 120m
+  hold-for: 480m
   scenario: quick-test
 
 scenarios:
   quick-test:
     requests:
-    - https://www.{{ subdomain }}
-    - https://www.{{ subdomain }}/#/login
-    - https://www.{{ subdomain }}/#/contact
-    - https://www.{{ subdomain }}/#/about
-    - https://www.{{ subdomain }}/?v=%3Cscript%3E
-    - https://petapi.{{ subdomain }}
-    - https://petapi.{{ subdomain }}/#/login
-    - https://petapi.{{ subdomain }}/#/contact
-    - https://petapi.{{ subdomain }}/#/about
-    - https://petapi.{{ subdomain }}/?v=%3Cscript%3E
-    - https://juiceshop.{{ subdomain }}
-    - https://juiceshop.{{ subdomain }}/#/login
-    - https://juiceshop.{{ subdomain }}/#/contact
-    - https://juiceshop.{{ subdomain }}/#/about
-    - https://juiceshop.{{ subdomain }}/?v=%3Cscript%3E
+    - https://juiceshop.lab.{{ basedomain }}
+    - https://juiceshop.lab.{{ basedomain }}/#/login
+    - https://juiceshop.lab.{{ basedomain }}/#/contact
+    - https://juiceshop.lab.{{ basedomain }}/#/about
+    - https://juiceshop.lab.{{ basedomain }}/?v=%3Cscript%3E
+    - https://juiceshop.dev.{{ basedomain }}
+    - https://juiceshop.dev.{{ basedomain }}/#/login
+    - https://juiceshop.dev.{{ basedomain }}/#/contact
+    - https://juiceshop.dev.{{ basedomain }}/#/about
+    - https://juiceshop.dev.{{ basedomain }}/?v=%3Cscript%3E
+    - https://saftladen.lab.{{ basedomain }}
+    - https://saftladen.lab.{{ basedomain }}/#/login
+    - https://saftladen.lab.{{ basedomain }}/#/contact
+    - https://saftladen.lab.{{ basedomain }}/#/about
+    - https://saftladen.lab.{{ basedomain }}/?v=%3Cscript%3E
+    - https://saftladen.dev.{{ basedomain }}
+    - https://saftladen.dev.{{ basedomain }}/#/login
+    - https://saftladen.dev.{{ basedomain }}/#/contact
+    - https://saftladen.dev.{{ basedomain }}/#/about
+    - https://saftladen.dev.{{ basedomain }}/?v=%3Cscript%3E
+    - https://veganlife.lab.{{ basedomain }}
+    - https://veganlife.lab.{{ basedomain }}/#/login
+    - https://veganlife.lab.{{ basedomain }}/#/contact
+    - https://veganlife.lab.{{ basedomain }}/#/about
+    - https://veganlife.lab.{{ basedomain }}/?v=%3Cscript%3E
+    - https://veganlife.dev.{{ basedomain }}
+    - https://veganlife.dev.{{ basedomain }}/#/login
+    - https://veganlife.dev.{{ basedomain }}/#/contact
+    - https://veganlife.dev.{{ basedomain }}/#/about
+    - https://veganlife.dev.{{ basedomain }}/?v=%3Cscript%3E
 

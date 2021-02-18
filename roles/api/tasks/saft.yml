@@ -1,0 +1,65 @@
+---
+#file: roles/api/tasks/juice.yml
+
+- name: Copy configuration file saft.yml
+  template: src=saft.yml dest=/tmp/saftladen.yml owner=root mode=0644
+  tags: saft
+  become: true
+
+- name: Pull an juiceshop image
+  docker_image:
+    name: bkimminich/juice-shop
+    source: pull
+  tags: saft
+  become: true
+
+- name: Stop "SAFTLADEN" container 
+  docker_container:
+    name: saftladen
+    image: bkimminich/juice-shop
+    state: stopped
+  tags: saft
+  become: true
+
+- name: Start a fruitshop container called "SAFTLADEN"
+  docker_container:
+    name: saftladen
+    image: bkimminich/juice-shop
+    state: started
+    env:
+      NODE_ENV: "saftladen"
+    volumes:
+      - /tmp/saftladen.yml:/juice-shop/config/saftladen.yml
+    ports:
+     - "4000:3000"
+  tags: saft
+  become: true
+
+- name: Copy configuration file saft.yml
+  template: src=saft-dev.yml dest=/tmp/saftladen-dev.yml owner=root mode=0644
+  tags: saft
+  become: true
+
+- name: Stop "SAFTLADEN - DEV" container 
+  docker_container:
+    name: saftladen-dev
+    image: bkimminich/juice-shop
+    state: stopped
+  tags: saft
+  become: true
+
+- name: Start a fruitshop container called "SAFTLADEN - DEV"
+  docker_container:
+    name: saftladen-dev
+    image: bkimminich/juice-shop
+    state: started
+    env:
+      NODE_ENV: "saftladen-dev"
+    volumes:
+      - /tmp/saftladen-dev.yml:/juice-shop/config/saftladen-dev.yml
+    ports:
+     - "4001:3000"
+  tags: saft
+  become: true
+
+

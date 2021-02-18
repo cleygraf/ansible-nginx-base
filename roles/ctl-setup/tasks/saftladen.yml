@@ -1,5 +1,5 @@
 ---
-# file: roles/ctl-setup/tasks/juiceshop.yml
+# file: roles/ctl-setup/tasks/saftladen.yml
 
 - name: Login to the controller
   uri:
@@ -14,9 +14,10 @@
     status_code: 204
     validate_certs: False
   register: login
-  tags: juice
+  tags: saft
+
 # Gateways
-- name: Create/configure JUICESHOP gateways
+- name: Create/configure SAFTLADEN gateways
   uri:
     url: "https://{{ baseurl }}/services/environments/{{ item[1] }}/gateways/{{ item[0] }}.{{ item[1] }}.{{ basedomain }}-gw"
     method: PUT
@@ -60,14 +61,14 @@
     status_code: 200,201,202
     validate_certs: False
   with_nested: 
-    - [ 'juiceshop', 'juiceapi' ]
+    - [ 'saftladen', 'saftapi' ]
     - [ 'lab', 'dev']
   tags: saft
 
-# Juiceshop web app
-- name: Create/configure JUICESHOP web app
+# Saftladen web app
+- name: Create/configure SAFTLADEN web app
   uri:
-    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/juiceshopweb_app"
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/saftladenweb_app"
     method: PUT
     headers:
       Cookie: "{{ login.set_cookie }}"
@@ -75,8 +76,8 @@
     body: >
       {
         "metadata": {
-          "name": "juiceshopweb_app",
-          "displayName": "Juiceshop Web",
+          "name": "saftladenweb_app",
+          "displayName": "Saftladen Web",
           "description": "",
           "tags": []
         },
@@ -87,11 +88,11 @@
   loop:
     - "lab"
     - "dev"
-  tags: juice
+  tags: saft
 
-- name: Create/configure JUICESHOP web app component
+- name: Create/configure SAFTLADEN web app component
   uri:
-    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/juiceshopweb_app/components/juiceshopweb_comp"
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/saftladenweb_app/components/saftladenweb_comp"
     method: PUT
     headers:
       Cookie: "{{ login.set_cookie }}"
@@ -99,14 +100,14 @@
     body: >
       {
         "metadata": {
-          "name": "juiceshopweb_comp",
+          "name": "saftladenweb_comp",
           "tags": []
         },
         "desiredState": {
           "ingress": {
             "gatewayRefs": [
               {
-                "ref": "/services/environments/{{ item }}/gateways/juiceshop.{{ item }}.{{ basedomain }}-gw"
+                "ref": "/services/environments/{{ item }}/gateways/saftladen.{{ item }}.{{ basedomain }}-gw"
               }
             ],
             "uris": {
@@ -124,7 +125,7 @@
             "ntlmAuthentication": "DISABLED",
             "preserveHostHeader": "DISABLED",
             "workloadGroups": {
-              "juiceshopweb_wlg": {
+              "saftladenweb_wlg": {
                 "locationRefs": [
                   {
                     "ref": "/infrastructure/locations/vmware"
@@ -134,7 +135,7 @@
                   "type": "ROUND_ROBIN"
                 },
                 "uris": {
-                  "http://api.{{ subdomain }}:{{ juicebackendport[item] }}": {
+                  "http://api.{{ subdomain }}:{{ saftbackendport[item] }}": {
                     "isBackup": false,
                     "isDown": false,
                     "isDrain": false
@@ -165,12 +166,12 @@
   loop:
     - "lab"
     - "dev"
-  tags: juice
+  tags: saft
 
-# Juiceshop api
-- name: Create/configure JUICESHOP api
+# Saftladen api
+- name: Create/configure SAFTLADEN api
   uri:
-    url: "https://{{ baseurl }}/services/api-definitions/juiceshopapi/versions/2.0.0"
+    url: "https://{{ baseurl }}/services/api-definitions/saftladenapi/versions/2.0.0"
     method: PUT
     headers:
       Cookie: "{{ login.set_cookie }}"
@@ -300,12 +301,12 @@
       }
     status_code: 200, 201, 202
     validate_certs: False
-  tags: juice
+  tags: saft
 
-# Juiceshop api publish
-- name: Publish JUICESHOP api 
+# Saftladen api publish
+- name: Publish SAFTLADEN api 
   uri:
-    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/juiceshopweb_app/published-apis/juiceshop_api"
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/saftladenweb_app/published-apis/saftladen_api"
     method: PUT
     headers:
       Cookie: "{{ login.set_cookie }}"
@@ -313,16 +314,16 @@
     body: >
       {
         "metadata": {
-          "name": "juiceshop_api",
+          "name": "saftladen_api",
           "tags": []
         },
         "desiredState": {
           "apiDefinitionVersionRef": {
-            "ref": "/services/api-definitions/juiceshopapi/versions/2.0.0"
+            "ref": "/services/api-definitions/saftladenapi/versions/2.0.0"
           },
           "gatewayRefs": [
             {
-              "ref": "/services/environments/{{ item }}/gateways/juiceapi.{{ item }}.{{ basedomain }}-gw"
+              "ref": "/services/environments/{{ item }}/gateways/saftapi.{{ item }}.{{ basedomain }}-gw"
             }
           ],
           "devportalRefs": [
@@ -339,12 +340,12 @@
   loop:
     - "lab"
     - "dev"
-  tags: juice
+  tags: saft
 
-# Juiceshop api component
-- name: Create/configure JUICESHOP api component
+# Saftladen api component
+- name: Create/configure SAFTLADEN api component
   uri:
-    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/juiceshopweb_app/components/juiceshopapi_comp"
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/saftladenweb_app/components/saftladenapi_comp"
     method: PUT
     headers:
       Cookie: "{{ login.set_cookie }}"
@@ -355,9 +356,9 @@
           "createTime": "2020-10-13T13:04:24Z",
           "kind": "components",
           "links": {
-            "rel": "/api/v1/services/environments/{{ item }}/apps/juiceshopweb_app/components/juiceshopapi_comp"
+            "rel": "/api/v1/services/environments/{{ item }}/apps/saftladenweb_app/components/saftladenapi_comp"
           },
-          "name": "juiceshopapi_comp",
+          "name": "saftladenapi_comp",
           "uid": "8622b04f-5ab2-41d1-8535-dd51c0c46343",
           "updateTime": "2020-10-13T14:28:42Z"
         },
@@ -366,12 +367,12 @@
             "ntlmAuthentication": "DISABLED",
             "preserveHostHeader": "DISABLED",
             "workloadGroups": {
-              "juiceshopapi_wlg": {
+              "saftladenapi_wlg": {
                 "loadBalancingMethod": {
                   "type": "ROUND_ROBIN"
                 },
                 "uris": {
-                  "http://api.{{ subdomain }}:{{ juicebackendport[item] }}": {
+                  "http://api.{{ subdomain }}:{{ saftbackendport[item] }}": {
                     "isBackup": false,
                     "isDown": false,
                     "isDrain": false
@@ -388,7 +389,7 @@
             },
             "gatewayRefs": [
               {
-                "ref": "/services/environments/{{ item }}/gateways/juiceapi.{{ item }}.{{ basedomain }}-gw"
+                "ref": "/services/environments/{{ item }}/gateways/saftapi.{{ item }}.{{ basedomain }}-gw"
               }
             ]
           },
@@ -400,7 +401,7 @@
           },
           "publishedApiRefs": [
             {
-              "ref": "/services/environments/{{ item }}/apps/juiceshopweb_app/published-apis/juiceshop_api"
+              "ref": "/services/environments/{{ item }}/apps/saftladenweb_app/published-apis/saftladen_api"
             }
           ],
           "security": {
@@ -415,4 +416,4 @@
   loop:
     - "lab"
     - "dev"
-  tags: juice
+  tags: saft

@@ -1,8 +1,16 @@
 ---
 # file: roles/ctl-setup/vars/main.yml
 
-baseurl: "{{ controllername }}.{{ subdomain }}/api/v1"
-
-location: "unspecified"
+location: "vmware"
 env: "lab"
 proxy: "{{ gwhostname }}.{{ subdomain }}"
+envproxy:
+  lab: 'n01.{{ subdomain }}'
+  dev: 'n02.{{ subdomain }}'
+  test: "n02.{{ subdomain }}"
+juicebackendport:
+  lab: '3000'
+  dev: '3001'
+saftbackendport:
+  lab: '4000'
+  dev: '4001'

@@ -1,0 +1,5 @@
+---
+# file: roles/test/tasks/main.yml
+
+- include_tasks: nginx.yml
+  tags: ['never','nginx']

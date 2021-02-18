@@ -39,7 +39,7 @@
 
 - name: Install the controller agent
   shell:
-    cmd: "API_KEY='{{ apiKey }}' sh /tmp/install.sh -y --insecure"
+    cmd: "API_KEY='{{ apiKey }}' sh /tmp/install.sh -y -l 'vmware' --insecure"
     creates: /lib/systemd/system/controller-agent.service
 
 # - name: Enable beta features
