@@ -21,10 +21,10 @@
     name: ca-certificates
     state: latest
 
-- name: install NGINX Plus
+- name: install NGINX Plus 
   yum:
     name: nginx-plus
-    state: latest
+    state: installed
 
 - name: install NGINX App Protect
   yum:
