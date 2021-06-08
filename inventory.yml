@@ -17,6 +17,10 @@ lb:
       new_hostname: n02.lab.leyux.org
       ansible_ssh_host: 192.168.111.142
 
+    lb01:
+      new_hostname: lb01.lab.leyux.org
+      ansible_ssh_host: 192.168.111.143
+
 api:
   hosts:
     api01:
@@ -43,4 +47,10 @@ ctl:
     ctl01:
       new_hostname: ctl.lab.leyux.org
       ansible_ssh_host: 192.168.111.140
-      
+
+nim:
+  hosts:
+    nim:
+      new_hostname: nim.lab.leyux.org
+      ansible_ssh_host: 192.168.111.139
+            
