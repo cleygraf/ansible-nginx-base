@@ -4,7 +4,7 @@
 - include_tasks: prerequisites.yml
   tags: core
 - include_tasks: saft.yml
-  tags: [ 'never', 'saft' ]
+  tags: [ 'saft' ]
 - include_tasks: juice.yml
   tags: juice
 - include_tasks: pets.yml

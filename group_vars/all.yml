@@ -21,11 +21,11 @@ organization: "NGINX BU at F5"
 country: "DE"
 
 # Paths to binaries, certs ...
-nginxplus_cert_key_path: ~/nginx/certs/
-server_cert_key_path: ~/nginx/ssl/
-nginx_binary_path: ~/nginx/binaries/
-nginx_license_path: ~/nginx/licenses/
-certificate_path: ~/certificates/
+nginxplus_cert_key_path: ~/nginx/certs
+server_cert_key_path: ~/nginx/ssl
+nginx_binary_path: ~/nginx/binaries
+nginx_license_path: ~/nginx/licenses
+certificate_path: ~/diskstation3/letsencrypt/live
 
 # Octa configuration
 octadomain: "dev-173872.okta.com"

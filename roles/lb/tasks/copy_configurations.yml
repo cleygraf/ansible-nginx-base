@@ -38,13 +38,13 @@
   template: src=var/log/nginx/security.log dest=/var/log/nginx/security.log owner=nginx group=nginx mode=0644
 
 - name: copy cert.pem
-  copy: src={{ certificate_path }}/{{ subdomain }}/cert1.pem dest=/etc/ssl/certs/cert.pem owner=root group=root mode=0644
+  copy: src={{ certificate_path }}/{{ subdomain }}-0001/cert.pem dest=/etc/ssl/certs/cert.pem owner=root group=root mode=0644
   
 - name: copy fullchain.pem
-  copy: src={{ certificate_path }}/{{ subdomain }}/fullchain1.pem dest=/etc/ssl/certs/fullchain.pem owner=root group=root mode=0644
+  copy: src={{ certificate_path }}/{{ subdomain }}-0001/fullchain.pem dest=/etc/ssl/certs/fullchain.pem owner=root group=root mode=0644
 
 - name: copy privkey.pem
-  copy: src={{ certificate_path }}/{{ subdomain }}/privkey1.pem dest=/etc/ssl/certs/privkey.pem owner=root group=root mode=0644
+  copy: src={{ certificate_path }}/{{ subdomain }}-0001/privkey.pem dest=/etc/ssl/certs/privkey.pem owner=root group=root mode=0644
 
 - name: Change ownership of a /etc/nginx/conf.d
   file:

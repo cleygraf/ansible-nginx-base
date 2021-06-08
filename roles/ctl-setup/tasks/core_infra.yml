@@ -49,8 +49,8 @@
         name: "{{ item }}_wildcard"
       desiredState:
         type: PEM
-        privateKey: "{{ lookup( 'file', '{{ certificate_path }}{{ item }}.{{ basedomain }}/privkey1.pem') }}"
-        publicCert: "{{ lookup( 'file', '{{ certificate_path }}{{ item }}.{{ basedomain }}/cert1.pem' ) }}"
+        privateKey: "{{ lookup( 'file', '{{ certificate_path }}/{{ item }}.{{ basedomain }}/privkey.pem') }}"
+        publicCert: "{{ lookup( 'file', '{{ certificate_path }}/{{ item }}.{{ basedomain }}/cert.pem' ) }}"
         caCerts: []
     status_code: 200,201,500
     validate_certs: False

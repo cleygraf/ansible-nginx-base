@@ -5,10 +5,10 @@
   file: path=/etc/ssl/nginx state=directory group=root mode=0700
 
 - name: copy NGINX Plus repository certificate
-  copy: src={{ nginxplus_cert_key_path }}nginx-repo.crt dest=/etc/ssl/nginx/nginx-repo.crt owner=root group=root mode=0700
+  copy: src={{ nginxplus_cert_key_path }}/nginx-repo.crt dest=/etc/ssl/nginx/nginx-repo.crt owner=root group=root mode=0700
 
 - name: copy NGINX Plus repository key
-  copy: src={{ nginxplus_cert_key_path }}nginx-repo.key dest=/etc/ssl/nginx/nginx-repo.key owner=root group=root mode=0700
+  copy: src={{ nginxplus_cert_key_path }}/nginx-repo.key dest=/etc/ssl/nginx/nginx-repo.key owner=root group=root mode=0700
 
 - name: Add yum NGINX Plus repository
   get_url: url=https://cs.nginx.com/static/files/nginx-plus-7.repo dest=/etc/yum.repos.d/nginx-plus-7.repo mode=0700
@@ -23,22 +23,22 @@
 
 - name: install NGINX Plus 
   yum:
-    name: nginx-plus
+    name: nginx-plus-23-1.el7.ngx
     state: installed
 
 - name: install NGINX App Protect
   yum:
-    name: app-protect
+    name: app-protect-23+3.462.0-1.el7.ngx
     state: latest
 
 - name: install NGINX App Protect Threat Campaigns
   yum:
-    name: app-protect-threat-campaigns
+    name: app-protect-threat-campaigns-2021.03.31-1.el7.ngx
     state: latest
 
 - name: install NGINX njs module
   yum:
-    name: nginx-plus-module-njs
+    name: nginx-plus-module-njs-23+0.5.2-1.el7.ngx
     state: latest
 
 - name: Start NGINX Plus service

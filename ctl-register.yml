@@ -1,7 +1,7 @@
 ---
 # file: ctl-setup.yml
 
-- hosts: lb
+- hosts: lb[0:2]
   gather_facts: no
 
   roles:

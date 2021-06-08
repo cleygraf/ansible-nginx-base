@@ -2,7 +2,7 @@
 # file: roles/ctl/vars/main.yml
 
 baseurl: "{{ controllername }}.{{ subdomain }}/api/v1"
-c3version: "3.6.0"
+c3version: "3.16.1"
 # controllerfile: "controller-installer-{{ c3version }}.tar.gz"
 
 # offlinebuild: "2182317" # 3.8
@@ -19,7 +19,11 @@ c3version: "3.6.0"
 # offlinebuild: "2774286" # 3.13RC2
 # offlinebuild: "2792189" # 3.13RC4
 # offlinebuild: "2831505" # 3.14RC0
-offlinebuild: "2870128" # 3.14RC2 (Final)
+# offlinebuild: "2870128" # 3.14RC2 (Final)
+offlinebuild: "305504137" # 3.17RCx
+# offlinebuild: "306556154" # 3.17RCx - Instance groups test
+
+
 
 controllerfile: "offline-controller-installer-{{ offlinebuild }}.tar.gz"
 

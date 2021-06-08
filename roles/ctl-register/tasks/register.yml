@@ -35,6 +35,7 @@
     dest: /tmp/install.sh
     mode: 0750
     url: https://{{ fqdn }}:8443/1.4/install/controller/
+#    url: https://{{ fqdn }}/install/controller-agent
     validate_certs: no
 
 - name: Install the controller agent

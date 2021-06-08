@@ -28,6 +28,8 @@
         - jq
         - net-tools
         - htop
+        - checkpolicy
+        - policycoreutils-python
       state: latest
 
   - name: Disable SELinux
