@@ -1,0 +1,93 @@
+---
+# file: roles/nim/tasks/install_nim.yml
+
+- name: create NGINX Plus ssl cert repo directory
+  file: path=/etc/ssl/nginx state=directory group=root mode=0700
+
+- name: copy NGINX Plus repository certificate
+  copy: src={{ nginxplus_cert_key_path }}/nginx-repo-nim.crt dest=/etc/ssl/nginx/nginx-repo.crt owner=root group=root mode=0700
+
+- name: copy NGINX Plus repository key
+  copy: src={{ nginxplus_cert_key_path }}/nginx-repo-nim.key dest=/etc/ssl/nginx/nginx-repo.key owner=root group=root mode=0700
+
+- name: Add yum NGINX Plus repository
+  get_url: url=https://cs.nginx.com/static/files/nginx-plus-7.repo dest=/etc/yum.repos.d/nginx-plus-7.repo mode=0700
+
+- name: Add yum NGINX Instance Manager repository
+  get_url: url=https://cs.nginx.com/static/files/instance-manager.repo dest=/etc/yum.repos.d/instance-manager.repo mode=0700
+
+- name: Download NGINX signing key
+  get_url: url=https://nginx.org/keys/nginx_signing.key dest=/tmp/nginx_signing.key mode=0700
+
+- name: Add NGINX signing key
+  shell: rpmkeys --import /tmp/nginx_signing.key
+
+- name: Create NGINX Instance Manager certificate directory, if necessary
+  file: path=/etc/ssl/nginx-manager state=directory group=root mode=0700
+
+- name: Copy fullchain.pem
+  copy: src={{ certificate_path }}/{{ subdomain }}-0001/fullchain.pem dest=/etc/ssl/nginx-manager/nginx-manager.crt owner=root group=root mode=0644
+
+- name: Copy privkey.pem
+  copy: src={{ certificate_path }}/{{ subdomain }}-0001/privkey.pem dest=/etc/ssl/nginx-manager/nginx-manager.key owner=root group=root mode=0644
+
+- name: install required package ca-certificates 
+  yum:
+    name: ca-certificates
+    state: latest
+
+- name: install NGINX Instance Manager
+  yum:
+    name: nginx-manager
+    state: installed
+
+- name: copy NGINX Instance Manager license
+  copy: src={{ nginxplus_cert_key_path }}/NGINXInstanceManagerLicense-FreeTrial dest=/etc/nginx-manager/nginx-manager.lic owner=root group=root mode=0700
+
+- name: Adjust hostname in NIM config file
+  lineinfile:
+    path: /etc/nginx-manager/nginx-manager.conf
+    regexp: '^server-name:'
+    line: 'server-name: {{ ansible_hostname }}.{{ subdomain }}'
+
+- name: Start NGINX Instance Manager service
+  service:
+    name: nginx-manager
+    state: restarted
+    enabled: yes
+
+- name: install NGINX Plus 
+  yum:
+    name: nginx-plus
+    state: installed
+
+- name: copy nginx-plus configuration file nginx.conf
+  template: src=etc/nginx/nginx.conf dest=/etc/nginx/nginx.conf owner=root mode=0644
+
+- name: copy nginx-plus configuration file nginx-plus-api.conf
+  template: src=etc/nginx/conf.d/nginx-plus-api.conf dest=/etc/nginx/conf.d/nginx-plus-api.conf owner=root mode=0644
+
+- name: copy nginx-plus configuration file nim.conf
+  template: src=etc/nginx/conf.d/nim.conf dest=/etc/nginx/conf.d/nim.conf owner=root mode=0644
+
+- name: reload nginx
+  service:
+    name: nginx
+    state: restarted
+    enabled: yes
+
+- name: install NIM agent 
+  yum:
+    name: nginx-agent
+    state: installed
+
+- name: copy nginx-agent configuration file nginx-agent.conf
+  template: src=etc/nginx/nginx-agent.conf dest=/etc/nginx/nginx-agent.conf owner=root mode=0644
+
+- name: reload nginx-agent
+  service:
+    name: nginx-agent
+    state: restarted
+    enabled: yes
+
+

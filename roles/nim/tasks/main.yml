@@ -1,0 +1,4 @@
+---
+# file: roles/nim/tasks/main.yml
+
+- include_tasks: install_nim.yml
