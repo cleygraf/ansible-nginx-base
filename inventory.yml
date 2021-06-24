@@ -1,12 +1,3 @@
-ws:
-  hosts:
-    ws01:
-      new_hostname: ws01.lab.leyux.org
-      ansible_ssh_host: 192.168.111.147
-    ws02:
-      new_hostname: ws02.lab.leyux.org
-      ansible_ssh_host: 192.168.111.148
-
 lb:
   hosts:
     n01:
@@ -16,10 +7,6 @@ lb:
     n02:
       new_hostname: n02.lab.leyux.org
       ansible_ssh_host: 192.168.111.142
-
-    lb01:
-      new_hostname: lb01.lab.leyux.org
-      ansible_ssh_host: 192.168.111.143
 
 api:
   hosts:
@@ -33,15 +20,6 @@ test:
       new_hostname: x1extreme.wn.leyux.org
       ansible_ssh_host: 192.168.1.4
 
-# tls:
-#   hosts:
-#     tls01:
-#       new_hostname: tls01.lab.leyux.org
-#       ansible_ssh_host: 192.168.111.112
-#     tls02:
-#       new_hostname: tls02.lab.leyux.org
-#       ansible_ssh_host: 192.168.111.113
-
 ctl:
   hosts:
     ctl01:
@@ -50,7 +28,7 @@ ctl:
 
 nim:
   hosts:
-    nim:
-      new_hostname: nim.lab.leyux.org
+    nim01:
+      new_hostname: nim01.lab.leyux.org
       ansible_ssh_host: 192.168.111.139
             

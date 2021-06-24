@@ -4,8 +4,8 @@
 - hosts: nim
 
   roles:
-    # - role: common
-    #   become: yes
+    - role: common
+      become: yes
 
     - role: nim
       become: yes
