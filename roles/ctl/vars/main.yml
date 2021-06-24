@@ -20,8 +20,9 @@ c3version: "3.16.1"
 # offlinebuild: "2792189" # 3.13RC4
 # offlinebuild: "2831505" # 3.14RC0
 # offlinebuild: "2870128" # 3.14RC2 (Final)
-offlinebuild: "305504137" # 3.17RCx
+# offlinebuild: "305504137" # 3.17RCx
 # offlinebuild: "306556154" # 3.17RCx - Instance groups test
+offlinebuild: "316472213" # 3.18
 
 
 

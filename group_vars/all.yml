@@ -8,6 +8,7 @@ subdomain: 'lab.{{ basedomain }}'
 controllername: ctl
 fqdn: "{{ controllername }}.{{ subdomain }}"
 baseurl: "{{ controllername }}.{{ subdomain }}/api/v1"
+gw_vip: "192.168.111.148"
 gwhostname: n01
 #gwadditionalhostnames: "petapi juiceshop juiceapi devportal www"
 gwadditionalhostnames: "juiceshop juiceapi devportal"

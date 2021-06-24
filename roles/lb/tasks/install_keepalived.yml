@@ -1,0 +1,26 @@
+---
+# file: roles/lb/tasks/keepalived.yml
+
+- name: Install keepalived
+  yum:
+    name: nginx-ha-keepalived
+    state: latest
+
+- name: Copy keepalived config file
+  template: src=etc/keepalived/keepalived.conf.{{ inventory_hostname }} dest=/etc/keepalived/keepalived.conf owner=root mode=0644
+
+- name: Set up support for non-local IP address bindings
+  sysctl:
+    name: net.ipv4.ip_nonlocal_bind
+    value: '1'
+    state: present
+
+- name: Configure keepalived service
+  service:
+    name: keepalived
+    state: stopped
+    enabled: yes
+
+- name: Restart host
+  reboot:
+
