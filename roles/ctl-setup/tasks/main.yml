@@ -5,7 +5,7 @@
   tags: user
 - include_tasks: core_infra.yml
   tags: core
-- include_tasks: juiceshop.yml
+- include_tasks: juiceshop_ha.yml
   tags: juice
 - include_tasks: saftladen.yml
   tags: [ 'never', 'saft' ]
