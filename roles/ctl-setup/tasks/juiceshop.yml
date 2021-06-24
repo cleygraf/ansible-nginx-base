@@ -15,6 +15,7 @@
     validate_certs: False
   register: login
   tags: juice
+
 # Gateways
 - name: Create/configure JUICESHOP gateways
   uri:
