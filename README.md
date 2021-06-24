@@ -25,41 +25,18 @@ Setup ssh login with keys for all servers. You might use ssh-add to add your pri
 
 #### Configure Ansible inventory
 
-I prefer to include as much as possible in the git repository. So I have added an inventory.yml file to hold all the details about the servers:
+All the details of the infrastructure are stored in `inventory.yml`.
 
-```
-...
-nginxplus-tls:
-  hosts:
-    tls01:
-      new_hostname: tls01.lab.leyux.org
-      ansible_ssh_host: 192.168.1.112
-    tls02:
-      new_hostname: tls02.lab.leyux.org
-      ansible_ssh_host: 192.168.1.113
-  vars:
-    ansible_become: yes
-    ansible_become_user: root
-    ansible_become_password: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          31323961353662633632306166663033643436313135366430666434313862656666393536323265
-          6635316339353537313736643163613439666134623733350a383461393638643762626630383232
-          62626435656239336135666562373961346664326239653166653866663639303461636238346662
-          6165366364663034650a323966373830316237646330386263613165663034656364653737363466
-          3632
-    nginxplus_cert_key_path: ~/nginx/certs/
-    server_cert_key_path: ~/nginx/ssl/
-...
-```
-
-Ansible will use the ip in *ansible_ssh_host* to connect to the target server. The hostname will be changed to "new_hostname". sudo will be used to become roor. If sudo needs a password, please encrypt and stored in ansible_become_password.
+Ansible will use the ip in *ansible_ssh_host* to connect to the target server. The hostname will be changed to "new_hostname". sudo will be used to become root. If sudo needs a password, please encrypt and stored in `ansible_become_password`.
 
 #### Ensure Ansible server has valid NGINX Plus license key and cert
 
-In order to install NGINX Plus using this playbook from the Ansible server
-you need to copy both your nginx-repo cert and key to your /etc/ssl/nginx directory.
+To install NGINX Plus the NGINX Plus repositories are used. To access these repositories 
+you have to provide a `nginx-repo.cert` and `nginx-repo.key` file. These files are expected to be find in
+`~/nginx/certs/`. 
 
-The /etc/ssl/nginx directory on your Ansible server should contain both files like so...
+This can be configured in `./group_vars/all.yml`. Just look for `nginxplus_cert_key_path`. Please also check the 
+other paths that can be configured in this file, e. g. for ssl certificates, the NGINX Controller license file ...
 
 ```
 [kjones@zion-development ~]# ls -l /etc/ssl/nginx/
