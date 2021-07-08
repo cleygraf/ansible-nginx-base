@@ -2,8 +2,9 @@
 # file: roles/ctl/vars/main.yml
 
 baseurl: "{{ controllername }}.{{ subdomain }}/api/v1"
-c3version: "3.16.1"
-# controllerfile: "controller-installer-{{ c3version }}.tar.gz"
+c3version: "3.18.0"
+#controllerfile: "controller-installer-{{ c3version }}.tar.gz"
+controllerfile: "apim-controller-installer-{{ c3version }}.tar.gz"
 
 # offlinebuild: "2182317" # 3.8
 # offlinebuild: "2268263" # 3.9RC2
@@ -24,9 +25,7 @@ c3version: "3.16.1"
 # offlinebuild: "306556154" # 3.17RCx - Instance groups test
 offlinebuild: "316472213" # 3.18
 
-
-
-controllerfile: "offline-controller-installer-{{ offlinebuild }}.tar.gz"
+#controllerfile: "offline-controller-installer-{{ offlinebuild }}.tar.gz"
 
 location: "unspecified"
 env: "lab"

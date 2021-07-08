@@ -15,6 +15,16 @@
     value: '1'
     state: present
 
+# Rename /etc/nginx/conf.d/default.conf if exists
+- name: Check if /etc/nginx/conf.d/default.conf  exists
+  stat:
+    path: "/etc/nginx/conf.d/default.conf"
+  register: defaultconf_result
+
+- name: Move /etc/nginx/conf.d/default.conf  to /etc/nginx/conf.d/default.conf.bak
+  shell: mv "/etc/nginx/conf.d/default.conf" "/etc/nginx/conf.d/default.conf.bak"
+  when: defaultconf_result.stat.exists == true
+
 - name: Configure keepalived service
   service:
     name: keepalived

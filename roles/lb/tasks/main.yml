@@ -1,6 +1,13 @@
 ---
 # file: roles/lb/tasks/main.yml
 
+# Install all required packages ...
 - include_tasks: install_nginxplus.yml
+
+# Only copy configuration files if NGINX Controller is not used
 - include_tasks: copy_configurations.yml
+  when: controllerless | bool
+
+# HA setup
 - include_tasks: install_keepalived.yml
+  when: gw_vip is defined

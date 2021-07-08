@@ -17,7 +17,7 @@
   tags: juice
 
 # Gateways
-- name: Create/configure JUICESHOP gateways
+- name: Create/configure JUICESHOP gateways - HA SETUP
   uri:
     url: "https://{{ baseurl }}/services/environments/{{ item[1] }}/gateways/{{ item[0] }}.{{ item[1] }}.{{ basedomain }}-gw"
     method: PUT

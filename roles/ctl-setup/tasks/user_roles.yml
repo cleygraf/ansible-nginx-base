@@ -38,7 +38,7 @@
   register: check_users
   tags: user
 
-- name: Create a couple of users    
+- name: Create the missing users    
   uri:
     url: "https://{{ baseurl }}/platform/users"
     method: POST

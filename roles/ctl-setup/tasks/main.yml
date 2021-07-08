@@ -1,14 +1,27 @@
 ---
 # file: roles/ctl-setup/tasks/main.yml
 
+# Setup users and roles
 - include_tasks: user_roles.yml
   tags: user
+
+# Setup the core stuff like gateways, devportal ...  
 - include_tasks: core_infra.yml
   tags: core
+
+# Setups juiceshop (without or with ha)
+- include_tasks: juiceshop.yml
+  tags: juice
+  when: gw_vip is undefined
 - include_tasks: juiceshop_ha.yml
   tags: juice
+  when: gw_vip is defined
+
+# Setup the German version of juiceshop
 - include_tasks: saftladen.yml
   tags: [ 'never', 'saft' ]
+
+# Setup additional apis
 - include_tasks: demo_api.yml
   tags: [ 'never', 'demo' ]
 - include_tasks: petstore.yml

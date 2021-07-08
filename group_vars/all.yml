@@ -1,19 +1,27 @@
 ---
 # file: group_vars/all.yml
 
+# Setup without controller
+controllerless: false
+
+#
 # Infrastructure
+#
 basedomain: 'leyux.org'
 # Domain used as "production" environment
 subdomain: 'lab.{{ basedomain }}'
+# NGINX Controller
 controllername: ctl
 fqdn: "{{ controllername }}.{{ subdomain }}"
 baseurl: "{{ controllername }}.{{ subdomain }}/api/v1"
+# If gw_vip is defined, we will setup an ha gateway
 gw_vip: "192.168.111.148"
 gwhostname: n01
-#gwadditionalhostnames: "petapi juiceshop juiceapi devportal www"
 gwadditionalhostnames: "juiceshop juiceapi devportal"
 
+#
 # User details for NGINX controller
+#
 firstname: Controller
 lastname: Man
 email: c.leygraf@f5.com
@@ -21,14 +29,22 @@ password: "F5Ng1nx!"
 organization: "NGINX BU at F5"
 country: "DE"
 
+#
 # Paths to binaries, certs ...
+#
+# Keys to access NGINX+ repositories
 nginxplus_cert_key_path: ~/nginx/certs
 server_cert_key_path: ~/nginx/ssl
+# Binaries, used to look for NGINX Controller binaries
 nginx_binary_path: ~/nginx/binaries
+# Licenses, used to store the NGINX Controller license file
 nginx_license_path: ~/nginx/licenses
+# Certificates
 certificate_path: ~/diskstation3/letsencrypt/live
 
+#
 # Octa configuration
+#
 octadomain: "dev-173872.okta.com"
 octaclientid: !vault |
           $ANSIBLE_VAULT;1.1;AES256
