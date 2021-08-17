@@ -166,7 +166,7 @@
           },
           "security": {
             "waf": {
-              "isEnabled": true,
+              "isEnabled": false,
               "isMonitorOnly": false
             },
             "strategyRef": {
