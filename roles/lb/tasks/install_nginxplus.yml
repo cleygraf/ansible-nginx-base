@@ -31,6 +31,11 @@
     name: app-protect
     state: latest
 
+- name: Install latest NGINX App Protect Attack Signatures
+  yum:
+    name: app-protect-attack-signatures
+    state: latest
+
 - name: Install NGINX App Protect Threat Campaigns
   yum:
     name: app-protect-threat-campaigns
