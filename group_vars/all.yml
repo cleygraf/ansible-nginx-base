@@ -15,7 +15,7 @@ controllername: ctl
 fqdn: "{{ controllername }}.{{ subdomain }}"
 baseurl: "{{ controllername }}.{{ subdomain }}/api/v1"
 # If gw_vip is defined, we will setup an ha gateway
-gw_vip: "192.168.111.148"
+#gw_vip: "192.168.111.148"
 gwhostname: n01
 gwadditionalhostnames: "juiceshop juiceapi devportal"
 
