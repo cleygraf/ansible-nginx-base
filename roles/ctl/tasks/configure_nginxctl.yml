@@ -1,0 +1,40 @@
+---
+# file: roles/ctl/tasks/configure_nginxctl.yml
+
+- name: login to the controller
+  uri:
+    url: "https://{{ baseurl }}/platform/login"
+    method: POST
+    body_format: json 
+    body: 
+      credentials: 
+        type: "BASIC"
+        username: "{{ email }}"
+        password: "{{ password }}"
+    status_code: 204
+    validate_certs: False
+  register: login 
+
+- name: Enable CAS
+  shell: /opt/nginx-controller/helper.sh setfeature AppSec true
+
+# Locations
+- name: Create/configure locations
+  uri:
+    url: "https://{{ baseurl }}/infrastructure/locations"
+    method: POST
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body:
+      metadata:
+        name: "{{ item }}"
+        displayName: "{{ item }}"
+        description: "Environment based on {{ item }}."
+      desiredState:
+        type: "OTHER_LOCATION"
+    status_code: 200,201,202
+    validate_certs: False
+  loop:
+    - "vmware"
+    - "container"
