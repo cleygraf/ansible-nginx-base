@@ -1,0 +1,21 @@
+---
+#file: roles/api-decommision/tasks/juice.yml
+
+- name: 'Stop the {{ myapp }} containers' 
+  docker_container:
+    name: '{{ myapp }}-{{ item }}'
+    state: stopped
+  tags: myapp
+  with_items: '{{ myappenvironment[myapp].split() }}'
+  become: true
+
+- name: 'Delete the {{ myapp }} containers'
+  docker_container:
+    name: '{{ myapp }}-{{ item }}'
+    state: absent
+  with_items: '{{ myappenvironment[myapp].split() }}'
+  tags: myapp
+  become: true
+
+
+

@@ -1,0 +1,9 @@
+server:
+  port: 3000
+application:
+  domain: juiceshop.dev.leyux.org
+  name: 'ControllerMan´s JUICESHOP !!! DEV !!!'
+  showGitHubLinks: false
+  localBackupEnabled: false
+  welcomeBanner:
+    showOnFirstStart: false

@@ -1,0 +1,142 @@
+---
+# file: roles/ctl-decommision/tasks/myapp.yml
+
+- name: Login to the controller
+  uri:
+    url: "https://{{ baseurl }}/platform/login"
+    method: POST
+    body_format: json
+    body:
+      credentials:
+        type: "BASIC"
+        username: "{{ email }}"
+        password: "{{ password }}"
+    status_code: 204
+    validate_certs: False
+  register: login
+  tags: myapp
+
+- name: 'Delete {{ myappname[myapp] }} api component'
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/{{ myapp }}_app/components/{{ myapp }}api_comp"
+    method: DELETE
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  with_items: '{{ myappenvironment[myapp].split() }}'
+  tags: myapp
+
+- name: 'Unpublish {{ myappname[myapp] }} api'
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/{{ myapp }}_app/published-apis/{{ myapp }}_api"
+    method: DELETE
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        
+      }
+    status_code: 200, 201, 202, 204
+    validate_certs: False
+  with_items: '{{ myappenvironment[myapp].split() }}'
+  tags: myapp
+
+- name: 'Delete {{ myappname[myapp] }} api'
+  uri:
+    url: "https://{{ baseurl }}/services/api-definitions/{{ myapp }}api/versions/2.0.0"
+    method: DELETE
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+
+      }
+    status_code: 200, 201, 202, 204
+    validate_certs: False
+  tags: myapp
+
+- name: 'Delete {{ myappname[myapp] }} web app component'
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/{{ myapp }}_app/components/{{ myapp }}_comp"
+    method: DELETE
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        
+      }
+    status_code: 200, 201, 202, 204
+    validate_certs: False
+  with_items: '{{ myappenvironment[myapp].split() }}'
+  tags: myapp
+
+- name: Pause for 60 seconds
+  pause:
+    seconds: 60
+
+
+- name: 'Delete {{ myappname[myapp] }} web app'
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/{{ myapp }}_app"
+    method: DELETE
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+
+      }
+    status_code: 200, 201, 202, 204
+    validate_certs: False
+  with_items: '{{ myappenvironment[myapp].split() }}'
+  tags: myapp
+
+- name: 'Delete {{ myappname[myapp] }} app gateways'
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ item[1] }}/gateways/{{ item[0] }}.{{ item[1] }}.{{ basedomain }}-gw"
+    method: DELETE
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      { 
+
+      }
+    status_code: 200,201,202,204
+  with_nested: 
+    - '{{ myapp.split() }}'
+    - '{{ myappenvironment[myapp].split() }}'
+  tags: myapp
+
+- name: 'Delete {{ myappname[myapp] }} api gateways'
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ item[1] }}/gateways/{{ item[0] }}api.{{ item[1] }}.{{ basedomain }}-gw"
+    method: DELETE
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      { 
+
+      }
+    status_code: 200, 201, 202, 204
+    validate_certs: False
+  with_nested: 
+    - '{{ myapp.split() }}'
+    - '{{ myappenvironment[myapp].split() }}'
+  tags: myapp
+
+
+
+
+
+

@@ -1,0 +1,25 @@
+---
+#file: infrastructure.yml
+
+  myapp: 'veganlife'
+
+  myappcontainer:
+    veganlife: 'saft'
+
+  myappname:
+    veganlife: 'VEGAN Life'
+
+  myappsecurity:
+    veganlife: 'true'
+
+  myappenvironment:
+    veganlife: 'lab dev'
+
+  myappbackendports:
+    veganlife:
+      lab: '5000'
+      dev: '5001'
+
+
+
+

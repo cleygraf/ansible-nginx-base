@@ -1,0 +1,59 @@
+server:
+  port: 3000
+application:
+  domain: saftladen.lab.leyux.org
+  name: 'Der einzig wahre SAFTLADEN'
+  theme: deeporange-indigo
+  showGitHubLinks: false
+  localBackupEnabled: false
+  altcoinName: Kerne
+  welcomeBanner:
+    showOnFirstStart: false
+  cookieConsent:
+    message: 'Unsere saftigen Cookies ermöglichen ein einzigartiges Erlebnis.'
+    dismissText: 'Her damit!'
+    linkText: 'Stop!'
+products:
+  - name: 'Apfel Saft (1l)'
+    price: 1.99
+    deluxePrice: 0.99
+    limitPerUser: 5
+    description: 'Derb Klassiker von schwäbischen Streuobstwiesen.'
+    image: apple_juice.jpg
+    reviews:
+      - { text: 'One of my favorites!', author: admin }
+  - name: 'Orangensaft (1l)'
+    description: 'Handgepflückt von Onkel Dittmeyer.'
+    price: 2.99
+    deluxePrice: 2.49
+    image: orange_juice.jpg
+    reviews:
+      - { text: 'y0ur f1r3wall needs m0r3 musc13', author: uvogin }
+  - name: 'Raspberry Saft (1 l)'
+    description: 'Aufbereiteter Raspberry Pi, Wasser und Zucker.'
+    price: 4.99
+    image: raspberry_juice.jpg
+    keywordsForPastebinDataLeakChallenge:
+      - hueteroneel
+      - eurogium edule
+  - name: 'Zitronenlimonade (500ml)'
+    description: 'Bitter wie das leben.'
+    price: 2.99
+    deluxePrice: 1.99
+    limitPerUser: 5
+    image: lemon_juice.jpg
+    fileForRetrieveBlueprintChallenge: JuiceShop.stl # ...to blueprint file type
+  - name: 'Bananensaft (1l)'
+    description: 'Für die affigen Momente des Lebens.'
+    price: 1.99
+    image: banana_juice.jpg
+    reviews:
+      - { text: 'Fry liked it too.', author: bender }
+    useForChristmasSpecialChallenge: true
+  - name: 'OWASP Juice Shop T-Shirt'
+    description: 'Für die wahren FANs des ControllerMan!'
+    price: 22.49
+    limitPerUser: 5
+    image: fan_shirt.jpg
+    urlForProductTamperingChallenge: 'https://www.owasp.org/index.php/O-Saft'
+

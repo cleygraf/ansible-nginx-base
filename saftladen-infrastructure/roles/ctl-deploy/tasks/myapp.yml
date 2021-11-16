@@ -1,0 +1,451 @@
+---
+# file: roles/ctl-deploy/tasks/myapp.yml
+
+- name: Login to the controller
+  uri:
+    url: "https://{{ baseurl }}/platform/login"
+    method: POST
+    body_format: json
+    body:
+      credentials:
+        type: "BASIC"
+        username: "{{ email }}"
+        password: "{{ password }}"
+    status_code: 204
+    validate_certs: False
+  register: login
+  tags: myapp
+
+- name: 'Create/configure {{ myappname[myapp] }} app gateways'
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ item[1] }}/gateways/{{ item[0] }}.{{ item[1] }}.{{ basedomain }}-gw"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      { "metadata": { 
+          "name": "{{ item[0] }}.{{ item[1] }}.{{ basedomain }}-gw",
+          "displayName": "{{ item[0] }}.{{ item[1] }}"        
+        },
+        "desiredState": {
+          "ingress": {
+            "uris": {
+              "http://{{ item[0] }}.{{ item[1] }}.{{ basedomain }}": {},
+              "https://{{ item[0] }}.{{ item[1] }}.{{ basedomain }}": {
+                "tls": {
+                  "certRef": {
+                    "ref": "/services/environments/{{ item[1] }}/certs/{{ item[1] }}_wildcard"
+                  },
+                  "protocols": [
+                    "TLSv1.2",
+                    "TLSv1.3"
+                  ],
+                  "preferServerCipher": "ENABLED"
+                }
+              }
+            },
+            "placement": {
+              "instanceRefs": [ { "ref": "/infrastructure/locations/{{ location }}/instances/{{ envproxy[item[1]] }}" } ] 
+            },
+            "tls": {
+              "certRef": {
+                "ref": "/services/environments/{{ item[1] }}/certs/{{ item[1] }}_wildcard"
+              },
+              "preferServerCipher": "DISABLED"
+            } 
+          }
+        }
+      }
+    status_code: 200,201,202
+    validate_certs: False
+  with_nested: 
+    - '{{ myapp.split() }}'
+    - '{{ myappenvironment[myapp].split() }}'
+  tags: myapp
+
+- name: 'Create/configure {{ myappname[myapp] }} api gateways'
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ item[1] }}/gateways/{{ item[0] }}api.{{ item[1] }}.{{ basedomain }}-gw"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      { "metadata": { 
+          "name": "{{ item[0] }}api.{{ item[1] }}.{{ basedomain }}-gw",
+          "displayName": "{{ item[0] }}api.{{ item[1] }}"        
+        },
+        "desiredState": {
+          "ingress": {
+            "uris": {
+              "http://{{ item[0] }}api.{{ item[1] }}.{{ basedomain }}": {},
+              "https://{{ item[0] }}api.{{ item[1] }}.{{ basedomain }}": {
+                "tls": {
+                  "certRef": {
+                    "ref": "/services/environments/{{ item[1] }}/certs/{{ item[1] }}_wildcard"
+                  },
+                  "protocols": [
+                    "TLSv1.2",
+                    "TLSv1.3"
+                  ],
+                  "preferServerCipher": "ENABLED"
+                }
+              }
+            },
+            "placement": {
+              "instanceRefs": [ { "ref": "/infrastructure/locations/{{ location }}/instances/{{ envproxy[item[1]] }}" } ] 
+            },
+            "tls": {
+              "certRef": {
+                "ref": "/services/environments/{{ item[1] }}/certs/{{ item[1] }}_wildcard"
+              },
+              "preferServerCipher": "DISABLED"
+            } 
+          }
+        }
+      }
+    status_code: 200,201,202
+    validate_certs: False
+  with_nested: 
+    - '{{ myapp.split() }}'
+    - '{{ myappenvironment[myapp].split() }}'
+  tags: myapp
+
+- name: 'Create/configure {{ myappname[myapp] }} web app'
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/{{ myapp }}_app"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "{{ myapp }}_app",
+          "displayName": "{{ myappname[myapp] }}",
+          "description": "",
+          "tags": []
+        },
+        "desiredState": {}
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  with_items: '{{ myappenvironment[myapp].split() }}'
+  tags: myapp
+
+- name: 'Create/configure {{ myappname[myapp] }} web app component'
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/{{ myapp }}_app/components/{{ myapp }}_comp"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "{{ myapp }}_comp",
+          "tags": []
+        },
+        "desiredState": {
+          "ingress": {
+            "gatewayRefs": [
+              {
+                "ref": "/services/environments/{{ item }}/gateways/{{ myapp }}.{{ item }}.{{ basedomain }}-gw"
+              }
+            ],
+            "uris": {
+              "/": {}
+            },
+            "tls": {
+              "certRef": {
+                "ref": "/services/environments/{{ item }}/certs/{{ item }}_wildcard"
+              },
+              "preferServerCipher": "DISABLED",
+              "sessionCache": "OFF"
+            }
+          },
+          "backend": {
+            "ntlmAuthentication": "DISABLED",
+            "preserveHostHeader": "DISABLED",
+            "workloadGroups": {
+              "saftladenweb_wlg": {
+                "locationRefs": [
+                  {
+                    "ref": "/infrastructure/locations/vmware"
+                  }
+                ],
+                "loadBalancingMethod": {
+                  "type": "ROUND_ROBIN"
+                },
+                "uris": {
+                  "http://api.{{ subdomain }}:{{ myappbackendports[myapp][item] }}": {
+                    "isBackup": false,
+                    "isDown": false,
+                    "isDrain": false
+                  }
+                }
+              }
+            }
+          },
+          "logging": {
+            "errorLog": "DISABLED",
+            "accessLog": {
+              "state": "DISABLED"
+            }
+          },
+          "security": {
+            "waf": {
+              "isEnabled": true,
+              "isMonitorOnly": false
+            },
+            "strategyRef": {
+              "ref": "/services/strategies/balanced_default"
+            }
+          }
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  with_items: '{{ myappenvironment[myapp].split() }}'
+  tags: myapp
+
+- name: 'Create/configure {{ myappname[myapp] }} api'
+  uri:
+    url: "https://{{ baseurl }}/services/api-definitions/{{ myapp }}api/versions/2.0.0"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "2.0.0",
+          "displayName": "{{ myappname[myapp] }} B2B API",
+          "description": "New & secure JSON-based API for our enterprise customers. (Deprecates previously offered XML-based endpoints)",
+          "tags": []
+        },
+        "desiredState": {
+          "specs": {
+            "REST": {
+              "openapi": "3.0.0",
+              "info": {
+                "description": "New & secure JSON-based API for our enterprise customers. (Deprecates previously offered XML-based endpoints)",
+                "license": {
+                  "name": "MIT",
+                  "url": "https://opensource.org/licenses/MIT"
+                },
+                "title": "{{ myappname[myapp] }} B2B API",
+                "version": "2.0.0"
+              },
+              "tags": [
+                {
+                  "description": "API for customer orders",
+                  "name": "Order"
+                }
+              ],
+              "paths": {
+                "/orders": {
+                  "x-controller-match-method": "EXACT",
+                  "post": {
+                    "summary": "Create new customer order",
+                    "description": "Create new customer order",
+                    "requestBody": {
+                      "description": "Customer order to be placed",
+                      "content": {
+                        "application/json": {
+                          "schema": {
+                            "properties": {
+                              "cid": {
+                                "example": "JS0815DE",
+                                "type": "string",
+                                "uniqueItems": true
+                              },
+                              "orderLines": {
+                                "items": {
+                                  "description": "Order line in default JSON format",
+                                  "properties": {
+                                    "customerReference": {
+                                      "example": "PO0000001",
+                                      "type": "string"
+                                    },
+                                    "productId": {
+                                      "example": 8,
+                                      "type": "integer"
+                                    },
+                                    "quantity": {
+                                      "example": 500,
+                                      "minimum": 1,
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "required": [
+                                    "productId",
+                                    "quantity"
+                                  ]
+                                },
+                                "type": "array"
+                              },
+                              "orderLinesData": {
+                                "description": "Order line(s) in customer specific JSON format",
+                                "example": "[{\"productId\": 12,\"quantity\": 10000,\"customerReference\": [\"PO0000001.2\", \"SM20180105|042\"],\"couponCode\": \"pes[Bh.u*t\"},{\"productId\": 13,\"quantity\": 2000,\"customerReference\": \"PO0000003.4\"}]",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "cid"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "responses": {
+                      "200": {
+                        "description": "New customer order is created",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "properties": {
+                                "cid": {
+                                  "example": "JS0815DE",
+                                  "type": "string",
+                                  "uniqueItems": true
+                                },
+                                "orderNo": {
+                                  "example": "3d06ac5e1bdf39d26392f8100f124742",
+                                  "type": "string",
+                                  "uniqueItems": true
+                                },
+                                "paymentDue": {
+                                  "description": "All payments are due 14 days after order placement",
+                                  "example": "2018-01-19T07:02:06.800Z",
+                                  "format": "date",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "cid",
+                                "orderNo",
+                                "paymentDue"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  tags: myapp
+
+- name: 'Publish {{ myappname[myapp] }} api'
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/{{ myapp }}_app/published-apis/{{ myapp }}_api"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "name": "{{ myapp }}_api",
+          "tags": []
+        },
+        "desiredState": {
+          "apiDefinitionVersionRef": {
+            "ref": "/services/api-definitions/saftladenapi/versions/2.0.0"
+          },
+          "gatewayRefs": [
+            {
+              "ref": "/services/environments/{{ item }}/gateways/{{ myapp }}api.{{ item }}.{{ basedomain }}-gw"
+            }
+          ],
+          "devportalRefs": [
+            {
+              "ref": "/services/environments/{{ item }}/devportals/devportal-{{ item }}"
+            }
+          ],
+          "basePath": "/v2",
+          "stripWorkloadBasePath": true
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  with_items: '{{ myappenvironment[myapp].split() }}'
+  tags: myapp
+
+- name: 'Create/configure {{ myappname[myapp] }} api component'
+  uri:
+    url: "https://{{ baseurl }}/services/environments/{{ item }}/apps/{{ myapp }}_app/components/{{ myapp }}api_comp"
+    method: PUT
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    body_format: json
+    body: >
+      {
+        "metadata": {
+          "kind": "components",
+          "links": {
+            "rel": "/api/v1/services/environments/{{ item }}/apps/{{ myapp }}_app/components/{{ myapp }}api_comp"
+          },
+          "name": "{{ myapp }}api_comp",
+        },
+        "desiredState": {
+          "backend": {
+            "ntlmAuthentication": "DISABLED",
+            "preserveHostHeader": "DISABLED",
+            "workloadGroups": {
+              "saftladenapi_wlg": {
+                "loadBalancingMethod": {
+                  "type": "ROUND_ROBIN"
+                },
+                "uris": {
+                  "http://api.{{ subdomain }}:{{ myappbackendports[myapp][item] }}": {
+                    "isBackup": false,
+                    "isDown": false,
+                    "isDrain": false
+                  }
+                }
+              }
+            }
+          },
+          "ingress": {
+            "uris": {
+              "/orders": {
+                "matchMethod": "EXACT"
+              }
+            },
+            "gatewayRefs": [
+              {
+                "ref": "/services/environments/{{ item }}/gateways/{{ myapp }}api.{{ item }}.{{ basedomain }}-gw"
+              }
+            ]
+          },
+          "logging": {
+            "accessLog": {
+              "state": "DISABLED"
+            },
+            "errorLog": "DISABLED"
+          },
+          "publishedApiRefs": [
+            {
+              "ref": "/services/environments/{{ item }}/apps/{{ myapp }}_app/published-apis/{{ myapp }}_api"
+            }
+          ],
+          "security": {
+            "waf": {
+              "isEnabled": false
+            }
+          }
+        }
+      }
+    status_code: 200, 201, 202
+    validate_certs: False
+  with_items: '{{ myappenvironment[myapp].split() }}'
+  tags: myapp

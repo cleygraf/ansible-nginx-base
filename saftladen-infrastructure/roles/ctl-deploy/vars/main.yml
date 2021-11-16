@@ -1,0 +1,16 @@
+---
+# file: roles/ctl-deploy/vars/main.yml
+
+location: "vmware"
+env: "lab"
+proxy: "{{ gwhostname }}.{{ subdomain }}"
+envproxy:
+  lab: 'n01.{{ subdomain }}'
+  dev: 'n02.{{ subdomain }}'
+  test: "n02.{{ subdomain }}"
+juicebackendport:
+  lab: '3000'
+  dev: '3001'
+saftbackendport:
+  lab: '4000'
+  dev: '4001'

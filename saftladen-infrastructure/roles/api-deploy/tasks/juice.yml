@@ -1,0 +1,42 @@
+---
+#file: roles/api-deploy/tasks/juice.yml
+
+- name: 'Copy the configuration files {{ myappcontainer[myapp] }}.yml'
+  template: src={{ myappcontainer[myapp] }}.yml dest='/tmp/{{myapp}}-{{ item }}.yml' owner=root mode=0644
+  tags: myapp
+  with_items: '{{ myappenvironment[myapp].split() }}'
+  become: true
+
+- name: Pull an juiceshop image
+  docker_image:
+    name: bkimminich/juice-shop
+    source: pull
+  tags: myapp
+  become: true
+
+- name: 'Stop the {{ myapp }} containers' 
+  docker_container:
+    name: '{{ myapp }}-{{ item }}'
+    image: bkimminich/juice-shop
+    state: stopped
+  tags: myapp
+  with_items: '{{ myappenvironment[myapp].split() }}'
+  become: true
+
+- name: 'Start the {{ myapp }} containers'
+  docker_container:
+    name: '{{ myapp }}-{{ item }}'
+    image: bkimminich/juice-shop
+    state: started
+    env:
+      NODE_ENV: "{{ myapp }}-{{ item }}"
+    volumes:
+      - /tmp/{{ myapp }}-{{ item }}.yml:/juice-shop/config/{{ myapp }}-{{ item }}.yml
+    ports:
+     - "{{ myappbackendports[myapp][item] }}:3000"
+  with_items: '{{ myappenvironment[myapp].split() }}'
+  tags: myapp
+  become: true
+
+
+

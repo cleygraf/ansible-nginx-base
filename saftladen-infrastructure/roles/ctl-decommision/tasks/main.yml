@@ -1,0 +1,5 @@
+---
+# file: roles/ctl-decommision/tasks/main.yml
+
+- include_tasks: myapp.yml
+

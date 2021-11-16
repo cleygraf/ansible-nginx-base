@@ -1,0 +1,6 @@
+#file nginx.yml
+
+- hosts: test
+  roles:
+    - role: nginx
+ 

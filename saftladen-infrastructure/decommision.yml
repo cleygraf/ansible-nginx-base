@@ -1,0 +1,17 @@
+---
+# file: decommision.yml
+
+- hosts: api
+  gather_facts: no
+  vars_files: infrastructure.yml
+
+  roles:
+  - role:  api-decommision
+
+- hosts: test
+  gather_facts: no
+  vars_files: infrastructure.yml
+
+  roles:
+  - role: ctl-decommision
+

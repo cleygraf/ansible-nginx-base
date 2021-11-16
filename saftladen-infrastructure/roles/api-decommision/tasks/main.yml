@@ -1,0 +1,5 @@
+---
+# file: roles/api-decommission/tasks/main.yml
+
+- include_tasks: juice.yml
+

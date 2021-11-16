@@ -1,0 +1,18 @@
+---
+# file: deploy.yml
+
+- hosts: api
+  gather_facts: no
+  vars_files: infrastructure.yml
+
+  roles:
+  - role: api-deploy
+
+- hosts: test
+  gather_facts: no
+  vars_files: infrastructure.yml
+
+  roles:
+#  - role: nginx
+  - role: ctl-deploy
+
