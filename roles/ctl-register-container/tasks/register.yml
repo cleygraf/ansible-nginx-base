@@ -1,0 +1,58 @@
+---
+# file: roles/ctl-register-container/tasks/register.yml
+
+# Registers a host with controller
+
+- name: Login to the controller
+  uri:
+    url: "https://{{ baseurl }}/platform/login"
+    method: POST
+    body_format: json
+    body:
+      credentials:
+        type: "BASIC"
+        username: "{{ email }}"
+        password: "{{ password }}"
+    status_code: 204
+    validate_certs: False
+  register: login
+
+- name: get the API key from the controller
+  uri:
+    url: "https://{{ baseurl }}/platform/global"
+    headers:
+      Cookie: "{{ login.set_cookie }}"
+    status_code: 200
+    validate_certs: False
+  register: globals
+
+- name: extract and store the API key
+  set_fact: 
+    apiKey : "{{ globals.json.currentStatus.agentSettings.apiKey }}"
+
+- name: Create temporary build directory
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: ".git"
+  register: tempdir_1
+
+- name: Clone https://github.com/nginxinc/docker-nginx-controller.git to "{{ tempdir_1.path }}""
+  ansible.builtin.git:
+    repo: https://github.com/nginxinc/docker-nginx-controller.git
+    dest: "{{ tempdir_1.path }}"
+
+- name: Copy NGINX Plus repository certificate
+  copy: src={{ nginxplus_cert_key_path }}/nginx-repo.crt dest={{ tempdir_1.path }}/centos/nap/nginx-repo.crt
+
+- name: Copy NGINX Plus repository key
+  copy: src={{ nginxplus_cert_key_path }}/nginx-repo.key dest={{ tempdir_1.path }}/centos/nap/nginx-repo.key
+
+- name: Build nginx-agent container
+  shell:
+    cmd: "sudo DOCKER_BUILDKIT=1 docker build --build-arg CONTROLLER_URL=https://ctl.lab.leyux.org/install/controller-agent --build-arg API_KEY='abcdefg' --secret id=nginx-crt,src=nginx-repo.crt --secret id=nginx-key,src=nginx-repo.key -t nginx-agent ."
+    chdir: "{{ tempdir_1.path }}/centos/nap/"
+
+- name: Run nginx-agent container
+  shell:
+    cmd: "sudo docker run --name nginx-container -d -e ENV_CONTROLLER_INSTANCE_GROUP=container_ig -e ENV_CONTROLLER_INSTANCE_NAME=nginx-container -e ENV_CONTROLLER_API_KEY={{ apiKey }} -p 80:80/tcp -p 443:443/tcp nginx-agent"
+    chdir: "{{ tempdir_1.path }}/centos/nap/"

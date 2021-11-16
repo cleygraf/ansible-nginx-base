@@ -1,0 +1,8 @@
+---
+# file: ctl-register-container.yml
+
+- hosts: api
+  gather_facts: no
+
+  roles:
+    - role: ctl-register-container
