@@ -106,26 +106,26 @@
     status_code: 200
     validate_certs: False
 
-- name: Enable CAS
-  shell: /opt/nginx-controller/helper.sh setfeature AppSec true
+# - name: Enable CAS
+#   shell: /opt/nginx-controller/helper.sh setfeature AppSec true
 
-# Locations
-- name: Create/configure locations
-  uri:
-    url: "https://{{ baseurl }}/infrastructure/locations/{{ item }}"
-    method: PUT
-    headers:
-      Cookie: "{{ login.set_cookie }}"
-    body_format: json
-    body:
-      metadata:
-        name: "{{ item }}"
-        displayName: "{{ item }}"
-        description: "Multipass environment"
-      desiredState:
-        type: "OTHER_LOCATION"
-    status_code: 200,201,202
-    validate_certs: False
-  loop:
-    - "vmware"
-    - "container"
+# # Locations
+# - name: Create/configure locations
+#   uri:
+#     url: "https://{{ baseurl }}/infrastructure/locations/{{ item }}"
+#     method: POST
+#     headers:
+#       Cookie: "{{ login.set_cookie }}"
+#     body_format: json
+#     body:
+#       metadata:
+#         name: "{{ item }}"
+#         displayName: "{{ item }}"
+#         description: "Environment based on {{ item }}."
+#       desiredState:
+#         type: "OTHER_LOCATION"
+#     status_code: 200,201,202
+#     validate_certs: False
+#   loop:
+#     - "vmware"
+#     - "container"
