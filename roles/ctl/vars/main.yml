@@ -2,7 +2,8 @@
 # file: roles/ctl/vars/main.yml
 
 baseurl: "{{ controllername }}.{{ subdomain }}/api/v1"
-c3version: "3.18.2"
+#c3version: "3.18.2" # Last APIM & ADC together version so far before 4.0
+c3version: "3.21.0"
 controllerfile: "controller-installer-{{ c3version }}.tar.gz"
 #controllerfile: "apim-controller-installer-{{ c3version }}.tar.gz"
 
